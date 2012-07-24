@@ -1,2 +1,10 @@
+# Object files.
 *.o
+
+# Executable files.
 ma
+create_dics/lemmas_and_prefixes
+
+# Dictionaries and source of them.
+dics/
+create_dics/src/
