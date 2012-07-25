@@ -113,9 +113,10 @@ void analyzer_free(Analyzer * analyzer);
 
 /*
     Searches lemmas/predict prefixes for word.
+    Returns true, if anything found.
 */
-void analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size);
-void analyzer_search_predict_prefixes(Analyzer * analyzer, char * word);
+bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size);
+bool analyzer_search_predict_prefixes(Analyzer * analyzer, char * word);
 
 #endif
 

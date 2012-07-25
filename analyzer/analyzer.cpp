@@ -49,8 +49,10 @@ void analyzer_free(Analyzer * analyzer)
 
 // Searches lemmas by word.
 // TODO Add buffer for results.
-void analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size)
+bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size)
 {
+    bool result = false;
+
     // Root of dictionary.
     dawgdic::BaseType index = analyzer -> lemmas.root();
 
@@ -96,6 +98,8 @@ void analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size)
                 {
                     // TODO Add result to buffer.
 
+                    result = true;
+
                     #ifdef ANALYZER_DEBUG
                         char * ids = analyzer -> rules -> forms -> ids;
                         printf("\t\tForm %d (%c%c)\n", value, ids[2 * value], ids[2 * value + 1]);
@@ -117,12 +121,16 @@ void analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size)
     #ifdef QUIET_ANALYZER_DEBUG
         printf("\n");
     #endif
+
+    return result;
 }
 
 // Searches predict prefix for the word.
 // TODO Result return?
-void analyzer_search_predict_prefixes(Analyzer * analyzer, char * word)
+bool analyzer_search_predict_prefixes(Analyzer * analyzer, char * word)
 {
+    bool result = false;
+
     // Root of dictionary.
     dawgdic::BaseType index = analyzer -> lemmas.root();
 
@@ -147,6 +155,10 @@ void analyzer_search_predict_prefixes(Analyzer * analyzer, char * word)
                 // Restoring the char.
                 *(q + 1) = old_char;
             #endif
+
+            result = true;
         }
     }
+
+    return result;
 }
