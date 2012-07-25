@@ -24,16 +24,25 @@ void analyze_file(Analyzer * analyzer, const char * filename)
 
     int len = text.size();
     for(int i = 0; i < len; i++)
-        analyzer_search_lemmas(analyzer, text[i], sizes[i]);
+        if(analyzer_search_lemmas(analyzer, text[i], sizes[i]))
+        {
+            printf("%d\n", 1);
+        }
+        else
+        {
+            printf("%d\n", 0);
+        }
 }
 
 int main()
 {
     Analyzer * analyzer = analyzer_new();
 
-    char word[] = {"якнбн"};
-    int word_size = strlen(word);
-    analyzer_search_lemmas(analyzer, word, word_size);
+    analyze_file(analyzer, "input");
+
+    //~ char word[] = {"якнбн"};
+    //~ int word_size = strlen(word);
+    //~ analyzer_search_lemmas(analyzer, word, word_size);
 
     analyzer_free(analyzer);
 
