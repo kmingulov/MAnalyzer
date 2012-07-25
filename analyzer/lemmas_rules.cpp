@@ -15,7 +15,7 @@ LemmasRules lemmas_rules_fread(const char * filename)
 
     // Reading count of them.
     fscanf(file, "%d", &(rules.count));
-    rules.rules = (short int **) malloc(sizeof(int) * rules.count);
+    rules.rules = (short int **) malloc(sizeof(short int *) * rules.count);
 
     char * buffer = (char *) calloc(1024, sizeof(char));
 
