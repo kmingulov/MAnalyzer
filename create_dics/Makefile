@@ -1,4 +1,4 @@
-all: lemmas_and_prefixes
+all: lemmas_and_prefixes lemmas_rules
 	mkdir -p ../dics
 	mkdir -p temp
 	# Prepare lemmas lexicon.
@@ -13,13 +13,16 @@ all: lemmas_and_prefixes
 	./lemmas_and_prefixes
 	# Making lemmas_rules
 	sqlite3 sqlite/lemmas.sqlite "SELECT value FROM shelf ORDER BY key;" | sed s/[\]\[,]//g > temp/lemmas_rules
-	cat temp/lemmas_rules | (while read line; do echo `echo -n $line | wc -w; echo " $line";` | sed s/\\n//g; done;) > ../dics/lemmas_rules
+	./lemmas_rules
 	# Remove temp.
 	rm -r temp/
 
 lemmas_and_prefixes: lemmas_and_prefixes.cpp
-	g++ -o lemmas_and_prefixes lemmas_and_prefixes.cpp
+	g++ -g -o lemmas_and_prefixes lemmas_and_prefixes.cpp
+
+lemmas_rules: lemmas_rules.c
+	gcc -g -std=c99 -o lemmas_rules lemmas_rules.c
 
 clean:
 	rm -rf ../dics
-	rm -f lemmas_and_prefixes
+	rm -f lemmas_and_prefixes lemmas_rules

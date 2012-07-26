@@ -3,8 +3,12 @@
 
 # Executable files.
 ma
+create_dics/lemmas_rules,
 create_dics/lemmas_and_prefixes
+
+# Backups.
+*~
 
 # Dictionaries and source of them.
 dics/
-create_dics/src/
+create_dics/sqlite
