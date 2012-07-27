@@ -23,11 +23,23 @@ all: lemmas_and_prefixes lemmas_rules
 	$(RECODE) utf8..cp1251 temp/prefixes_sorted
 	# Creating dawgdics.
 	./lemmas_and_prefixes
+
 	# Making lemmas_rules
 	./lemmas_rules
-	echo `wc -w ../dics/lemmas_rules | cut -f1 --delimiter=" "` > ../dics/lemmas_rules_
-	cat ../dics/lemmas_rules >> ../dics/lemmas_rules_
-	mv ../dics/lemmas_rules_ ../dics/lemmas_rules
+	# Add count of rules to the first line.
+	sed -i "1i`wc -l ../dics/lemmas_rules | cut -f1 --delimiter=' '`" ../dics/lemmas_rules
+
+	# Making rules.
+	# Add count of forms to each line;
+	cat temp/raw_rules | while read line; do \
+		forms_count=`(echo -n \`echo "$$line" | wc -w\`; echo "/3";) | bc -q`; \
+		echo "$$forms_count $$line"; \
+	done > temp/rules_with_counts;
+	# Add count of rules to the first line.
+	sed -i "1i`wc -l temp/rules_with_counts | cut -f1 --delimiter=' '`" temp/rules_with_counts
+	# Splitting raw rules into files (to sort each rule).
+	# Sort each rule.
+	# Merge rules back into one file.
 
 	# Remove temp.
 	#~ rm -r temp/
