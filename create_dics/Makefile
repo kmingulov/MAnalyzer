@@ -59,7 +59,7 @@ all: lemmas_and_prefixes lemmas_rules rules_split_and_sort rules_dics
 	sed -i "1i`wc -l ../dics/rules/forms | cut -f1 --delimiter=' '`" ../dics/rules/forms
 
 	# Remove temp.
-	#~ rm -r temp/
+	rm -r temp/
 
 lemmas_and_prefixes: lemmas_and_prefixes.cpp
 	$(C++) -g -o lemmas_and_prefixes lemmas_and_prefixes.cpp
