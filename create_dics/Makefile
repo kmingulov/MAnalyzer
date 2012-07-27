@@ -21,13 +21,16 @@ all: lemmas_and_prefixes lemmas_rules
 	# Prepare predict prefixes lexicon.
 	sort temp/prefixes > temp/prefixes_sorted
 	$(RECODE) utf8..cp1251 temp/prefixes_sorted
-	# Creating dics.
+	# Creating dawgdics.
 	./lemmas_and_prefixes
 	# Making lemmas_rules
 	./lemmas_rules
+	echo `wc -w ../dics/lemmas_rules | cut -f1 --delimiter=" "` > ../dics/lemmas_rules_
+	cat ../dics/lemmas_rules >> ../dics/lemmas_rules_
+	mv ../dics/lemmas_rules_ ../dics/lemmas_rules
 
 	# Remove temp.
-	rm -r temp/
+	#~ rm -r temp/
 
 lemmas_and_prefixes: lemmas_and_prefixes.cpp
 	g++ -g -o lemmas_and_prefixes lemmas_and_prefixes.cpp

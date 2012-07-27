@@ -32,7 +32,7 @@ void create_dic(const char * input_file, const char * output_file)
 int main()
 {
     create_dic("temp/prefixes_sorted", "../dics/predict_prefixes.dawgdic");
-    create_dic("temp/lemmas_sorted", "../dics/lemmas.dawgdic");
+    create_dic("temp/lemmas", "../dics/lemmas.dawgdic");
 
     return 0;
 }
