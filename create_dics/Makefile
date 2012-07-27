@@ -1,19 +1,31 @@
+SQLITE = sqlite3
+RECODE = recode
+C = gcc
+C++ = g++
+
 all: lemmas_and_prefixes lemmas_rules
 	mkdir -p ../dics
 	mkdir -p temp
+
+	# Preparing data from sqlite-base.
+	# Lemmas and prefixes.
+	$(SQLITE) sqlite/lemmas.sqlite "SELECT key FROM shelf ORDER BY key;" > temp/lemmas
+	$(SQLITE) sqlite/misc.sqlite "SELECT value FROM shelf WHERE key = 'prefixes';" | sed s/", "/\\n/g | sed s/[\]\[\"]//g > temp/prefixes
+	# Lemmas rules.
+	$(SQLITE) sqlite/lemmas.sqlite "SELECT value FROM shelf ORDER BY key;" | sed s/[\]\[,]//g > temp/lemmas_rules
+	# Raw rules.
+	$(SQLITE) sqlite/rules.sqlite "SELECT value FROM shelf;" | sed s/\"\"/*/g | sed s/[\]\[\",]//g > temp/raw_rules
+
 	# Prepare lemmas lexicon.
-	sqlite3 sqlite/lemmas.sqlite "SELECT key FROM shelf ORDER BY key;" > temp/lemmas
-	sort temp/lemmas > temp/lemmas_sorted
-	recode utf8..cp1251 temp/lemmas_sorted
+	$(RECODE) utf8..cp1251 temp/lemmas
 	# Prepare predict prefixes lexicon.
-	sqlite3 sqlite/misc.sqlite "SELECT value FROM shelf WHERE key = 'prefixes';" | sed s/", "/\\n/g | sed s/[\]\[\"]//g > temp/prefixes
 	sort temp/prefixes > temp/prefixes_sorted
-	recode utf8..cp1251 temp/prefixes_sorted
+	$(RECODE) utf8..cp1251 temp/prefixes_sorted
 	# Creating dics.
 	./lemmas_and_prefixes
 	# Making lemmas_rules
-	sqlite3 sqlite/lemmas.sqlite "SELECT value FROM shelf ORDER BY key;" | sed s/[\]\[,]//g > temp/lemmas_rules
 	./lemmas_rules
+
 	# Remove temp.
 	rm -r temp/
 
