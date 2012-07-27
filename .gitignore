@@ -1,11 +1,16 @@
 # Object files.
 *.o
 
+# Hidden files.
+.*
+!.gitignore
+
 # Executable files.
 ma
 create_dics/lemmas_rules
 create_dics/lemmas_and_prefixes
 create_dics/rules_split_and_sort
+create_dics/rules_dics
 
 # Backups and temporary data.
 *~
