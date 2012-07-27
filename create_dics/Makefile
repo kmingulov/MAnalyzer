@@ -3,7 +3,7 @@ RECODE = recode
 C = gcc
 C++ = g++
 
-all: lemmas_and_prefixes lemmas_rules
+all: lemmas_and_prefixes lemmas_rules rules_split_and_sort
 	mkdir -p ../dics
 	mkdir -p temp
 
@@ -37,19 +37,23 @@ all: lemmas_and_prefixes lemmas_rules
 	done > temp/rules_with_counts;
 	# Add count of rules to the first line.
 	sed -i "1i`wc -l temp/rules_with_counts | cut -f1 --delimiter=' '`" temp/rules_with_counts
-	# Splitting raw rules into files (to sort each rule).
-	# Sort each rule.
+	# Splitting raw rules into files and sort them.
+	mkdir -p temp/splitted/
+	./rules_split_and_sort
 	# Merge rules back into one file.
 
 	# Remove temp.
 	#~ rm -r temp/
 
 lemmas_and_prefixes: lemmas_and_prefixes.cpp
-	g++ -g -o lemmas_and_prefixes lemmas_and_prefixes.cpp
+	$(C++) -g -o lemmas_and_prefixes lemmas_and_prefixes.cpp
 
 lemmas_rules: lemmas_rules.c
-	gcc -g -std=c99 -o lemmas_rules lemmas_rules.c
+	$(C) -g -std=c99 -o lemmas_rules lemmas_rules.c
+
+rules_split_and_sort: rules_split_and_sort.cpp
+	$(C++) -g -o rules_split_and_sort rules_split_and_sort.cpp
 
 clean:
 	rm -rf ../dics
-	rm -f lemmas_and_prefixes lemmas_rules
+	rm -f lemmas_and_prefixes lemmas_rules rules_split_and_sort
