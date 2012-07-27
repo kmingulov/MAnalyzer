@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
-#include <cstring>
 
 using namespace std;
 
@@ -41,6 +40,10 @@ int main()
     }
 
     input.close();
+
+    ofstream output("temp/splitted/info");
+    output << count << endl;
+    output.close();
 
     return 0;
 }

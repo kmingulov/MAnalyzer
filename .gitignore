@@ -3,11 +3,13 @@
 
 # Executable files.
 ma
-create_dics/lemmas_rules,
+create_dics/lemmas_rules
 create_dics/lemmas_and_prefixes
+create_dics/rules_split_and_sort
 
-# Backups.
+# Backups and temporary data.
 *~
+create_dics/temp
 
 # Dictionaries and source of them.
 dics/

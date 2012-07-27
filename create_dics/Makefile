@@ -29,6 +29,17 @@ all: lemmas_and_prefixes lemmas_rules rules_split_and_sort
 	# Add count of rules to the first line.
 	sed -i "1i`wc -l ../dics/lemmas_rules | cut -f1 --delimiter=' '`" ../dics/lemmas_rules
 
+	# Making gramtab.
+	sqlite3 sqlite/misc.sqlite "SELECT value FROM shelf WHERE key='gramtab'" | \
+	# Add newlines. \
+	sed s/],\ \"/]\\n/g | \
+	# Remove quotes. \
+	sed s/\ \"//g | sed s/\"://g | \
+	# And at the begining and the end too. \
+	sed s/{\"// | sed s/]}/]/ > temp/raw_gramtab
+	# Sort and enumerate each line.
+	sort temp/raw_gramtab | cat -n > temp/gramtab
+
 	# Making rules.
 	# Add count of forms to each line;
 	cat temp/raw_rules | while read line; do \
@@ -43,7 +54,7 @@ all: lemmas_and_prefixes lemmas_rules rules_split_and_sort
 	# Merge rules back into one file.
 
 	# Remove temp.
-	#~ rm -r temp/
+	rm -r temp/
 
 lemmas_and_prefixes: lemmas_and_prefixes.cpp
 	$(C++) -g -o lemmas_and_prefixes lemmas_and_prefixes.cpp
