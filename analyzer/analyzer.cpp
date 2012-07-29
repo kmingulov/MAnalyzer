@@ -96,7 +96,13 @@ bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size)
 
                 // Searching ending in rule's dawgdic.
                 int value;
-                if(analyzer -> rules -> dics[rules[i + 1]].Find(ending, ending_len, &value))
+                //char no_prefix[] = "*";
+                if
+                (
+                    // TODO Support for endings with null length?
+                    (ending_len != 0 && analyzer -> rules -> dics[rules[i + 1]].Find(ending, ending_len, &value))// ||
+                    //(ending_len == 0 && analyzer -> rules -> dics[rules[i + 1]].Find(&no_prefix[0], 1, &value))
+                )
                 {
                     int count = analyzer -> rules -> forms -> counts[value];
                     FormInfo * forms = analyzer -> rules -> forms -> forms[value];
@@ -131,10 +137,8 @@ bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size)
 
 // Searches predict prefix for the word.
 // TODO Result return?
-bool analyzer_search_predict_prefixes(Analyzer * analyzer, char * word)
+char * analyzer_search_predict_prefixes(Analyzer * analyzer, char * word)
 {
-    bool result = false;
-
     // Root of dictionary.
     dawgdic::BaseType index = analyzer -> lemmas.root();
 
@@ -160,9 +164,38 @@ bool analyzer_search_predict_prefixes(Analyzer * analyzer, char * word)
                 *(q + 1) = old_char;
             #endif
 
-            result = true;
+            return q + 1;
         }
     }
 
-    return result;
+    return NULL;
+}
+
+//******************************************************************************
+// ANALYZER MAIN FUNCTION
+//******************************************************************************
+bool analyzer_get_word_info(Analyzer * analyzer, char * word, int word_size)
+{
+    // TODO Predict prefixes with identical beginings?
+
+    // Cut off predict prefix (if exists).
+    char * new_word = analyzer_search_predict_prefixes(analyzer, word);
+
+    if(new_word == NULL)
+        new_word = word;
+
+    int predict_prefix_size = (int) (new_word - word);
+
+    // Now search for lemmas.
+    bool result = analyzer_search_lemmas(analyzer, new_word, word_size - predict_prefix_size);
+
+    if(result)
+        return result;
+
+    // Nothing found? Let's search for prefix for new_word.
+
+    // TODO Found prefix (ПО and НАИ in russian language).
+    // Then search lemmas for the rest part of the word.
+    // If and here we found nothing -- search for "#" + word (sic! not the
+    // new_word).
 }
