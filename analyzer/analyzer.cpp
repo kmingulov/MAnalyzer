@@ -134,7 +134,6 @@ bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size)
 }
 
 // Searches predict prefix for the word.
-// TODO Result return?
 char * analyzer_search_predict_prefixes(Analyzer * analyzer, char * word)
 {
     // Root of dictionary.
@@ -174,7 +173,8 @@ char * analyzer_search_predict_prefixes(Analyzer * analyzer, char * word)
 //******************************************************************************
 bool analyzer_get_word_info(Analyzer * analyzer, char * word, int word_size)
 {
-    // TODO Predict prefixes with identical beginings?
+    // TODO Predict prefixes with identical beginings? Example: ДЕ and ДЕЗ.
+    // This function won't word for word ДЕЗОРИЕНТИРОВАННЫЙ.
 
     // Cut off predict prefix (if exists).
     char * new_word = analyzer_search_predict_prefixes(analyzer, word);
