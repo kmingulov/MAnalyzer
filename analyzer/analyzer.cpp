@@ -96,12 +96,10 @@ bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size)
 
                 // Searching ending in rule's dawgdic.
                 int value;
-                //char no_prefix[] = "*";
                 if
                 (
-                    // TODO Support for endings with null length?
-                    (ending_len != 0 && analyzer -> rules -> dics[rules[i + 1]].Find(ending, ending_len, &value))// ||
-                    //(ending_len == 0 && analyzer -> rules -> dics[rules[i + 1]].Find(&no_prefix[0], 1, &value))
+                    (ending_len != 0 && analyzer -> rules -> dics[rules[i + 1]].Find(ending, ending_len, &value)) ||
+                    (ending_len == 0 && analyzer -> rules -> dics[rules[i + 1]].Find("*", 1, &value))
                 )
                 {
                     int count = analyzer -> rules -> forms -> counts[value];
