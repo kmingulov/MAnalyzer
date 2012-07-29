@@ -28,12 +28,17 @@ void lemmas_rules_free(LemmasRules rules);
 // FORMS
 //******************************************************************************
 
+struct FormInfo
+{
+    char prefix;
+    unsigned short int id;
+};
+
 struct Forms
 {
     int count;
-    int current;
-    char * ids;
-    char * prefixes;
+    char * counts;
+    FormInfo ** forms;
 };
 
 /*
@@ -45,11 +50,6 @@ Forms * forms_new(int count);
     Frees forms' array.
 */
 void forms_free(Forms * forms);
-
-/*
-    Adds form to forms. Returns id of added form.
-*/
-int forms_add_form(Forms * forms, const char * id, const char prefix);
 
 /*
     Loads forms from file.

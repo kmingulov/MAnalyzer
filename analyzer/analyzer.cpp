@@ -69,6 +69,7 @@ bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size)
             int value = analyzer -> lemmas.value(index);
             short int * rules = analyzer -> l_rules.rules[value];
             char * ending = q + 1;
+            int ending_len = word_size - ((q + 1) - word);
 
             // Debug information.
             #ifdef ANALYZER_DEBUG
@@ -83,7 +84,7 @@ bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size)
                 *(q + 1) = old_char;
 
                 // Printing ending.
-                printf("(Possibly) ending is %s (%d).\n", ending, word_size - ((q + 1) - word));
+                printf("(Possibly) ending is %s (%d).\n", ending, ending_len);
             #endif
 
             // Going through all rules for this lemma and check the ending.
@@ -93,22 +94,25 @@ bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size)
                     printf("\tRule %d\n", rules[i + 1]);
                 #endif
 
+                // Searching ending in rule's dawgdic.
                 int value;
-                if(analyzer -> rules -> dics[rules[i + 1]].Find(q + 1, word_size - ((q + 1) - word), &value))
+                if(analyzer -> rules -> dics[rules[i + 1]].Find(ending, ending_len, &value))
                 {
-                    // TODO Add result to buffer.
+                    int count = analyzer -> rules -> forms -> counts[value];
+                    FormInfo * forms = analyzer -> rules -> forms -> forms[value];
+                    // Check for each prefix and forming result.
+                    for(int j = 0; j < count; j++)
+                    {
+                        result = true;
 
-                    result = true;
+                        #ifdef ANALYZER_DEBUG
+                            printf("\t\tForm %d\n", forms[j].id);
+                        #endif
 
-                    #ifdef ANALYZER_DEBUG
-                        char * ids = analyzer -> rules -> forms -> ids;
-                        printf("\t\tForm %d (%c%c)\n", value, ids[2 * value], ids[2 * value + 1]);
-                    #endif
-
-                    #ifdef QUIET_ANALYZER_DEBUG
-                        char * ids = analyzer -> rules -> forms -> ids;
-                        printf("%c%c ", ids[2 * value], ids[2 * value + 1]);
-                    #endif
+                        #ifdef QUIET_ANALYZER_DEBUG
+                            printf("%d ", forms[j].id);
+                        #endif
+                    }
                 }
             }
         }
