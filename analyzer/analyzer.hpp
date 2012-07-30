@@ -115,7 +115,7 @@ void analyzer_free(Analyzer * analyzer);
     Searches lemmas for word.
     Returns true, if anything found.
 */
-bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size);
+bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size, char prefix);
 
 /*
     Searches predict prefixes for word.

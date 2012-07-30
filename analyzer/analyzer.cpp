@@ -49,7 +49,7 @@ void analyzer_free(Analyzer * analyzer)
 
 // Searches lemmas by word.
 // TODO Add buffer for results.
-bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size)
+bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size, char prefix)
 {
     bool result = false;
 
@@ -106,17 +106,18 @@ bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size)
                     FormInfo * forms = analyzer -> rules -> forms -> forms[value];
                     // Check for each prefix and forming result.
                     for(int j = 0; j < count; j++)
-                    {
-                        result = true;
+                        if(prefix == forms[j].prefix)
+                        {
+                            result = true;
 
-                        #ifdef ANALYZER_DEBUG
-                            printf("\t\tForm %d\n", forms[j].id);
-                        #endif
+                            #ifdef ANALYZER_DEBUG
+                                printf("\t\tForm %d\n", forms[j].id);
+                            #endif
 
-                        #ifdef QUIET_ANALYZER_DEBUG
-                            printf("%d ", forms[j].id);
-                        #endif
-                    }
+                            #ifdef QUIET_ANALYZER_DEBUG
+                                printf("%d ", forms[j].id);
+                            #endif
+                        }
                 }
             }
         }
@@ -185,7 +186,7 @@ bool analyzer_get_word_info(Analyzer * analyzer, char * word, int word_size)
     int predict_prefix_size = (int) (new_word - word);
 
     // Now search for lemmas.
-    bool result = analyzer_search_lemmas(analyzer, new_word, word_size - predict_prefix_size);
+    bool result = analyzer_search_lemmas(analyzer, new_word, word_size - predict_prefix_size, 1);
 
     if(result)
         return result;
