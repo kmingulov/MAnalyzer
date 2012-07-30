@@ -138,7 +138,7 @@ bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size, cha
 char * analyzer_search_predict_prefixes(Analyzer * analyzer, char * word)
 {
     // Root of dictionary.
-    dawgdic::BaseType index = analyzer -> lemmas.root();
+    dawgdic::BaseType index = analyzer -> predict_prefixes.root();
 
     // Prefix matching in the predict prefixes DAWG dic.
     for(char *q = word; *q != '\0'; q++)
