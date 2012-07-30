@@ -174,27 +174,42 @@ char * analyzer_search_predict_prefixes(Analyzer * analyzer, char * word)
 //******************************************************************************
 bool analyzer_get_word_info(Analyzer * analyzer, char * word, int word_size)
 {
-    // TODO Predict prefixes with identical beginings? Example: ДЕ and ДЕЗ.
-    // This function won't word for word ДЕЗОРИЕНТИРОВАННЫЙ.
+    // TODO Add search without predict prefix.
 
-    // Cut off predict prefix (if exists).
-    char * new_word = analyzer_search_predict_prefixes(analyzer, word);
+    // For each predict prefix, what we found...
+    dawgdic::BaseType index = analyzer -> predict_prefixes.root();
+    for(char *q = word; *q != '\0'; q++)
+    {
+        if(!analyzer -> predict_prefixes.Follow(*q, &index))
+            break;
 
-    if(new_word == NULL)
-        new_word = word;
+        // Found predict prefix.
+        if(analyzer -> predict_prefixes.has_value(index))
+        {
+            // Debug information.
+            #ifdef ANALYZER_DEBUG
+                // Cutting off the begining.
+                char old_char = *(q + 1);
+                *(q + 1) = '\0';
 
-    int predict_prefix_size = (int) (new_word - word);
+                printf("Predict prefix is %s (%d)\n", word, q + 1 - word);
 
-    // Now search for lemmas.
-    bool result = analyzer_search_lemmas(analyzer, new_word, word_size - predict_prefix_size, 1);
+                // Restoring the char.
+                *(q + 1) = old_char;
+            #endif
 
-    if(result)
-        return result;
+            char * new_word = q + 1;
+            int new_word_size = word_size - (q + 1 - word);
 
-    // Nothing found? Let's search for prefix for new_word.
+            // Now search for lemmas (without prefix).
+            if(analyzer_search_lemmas(analyzer, new_word, new_word_size, 1))
+                return true;
 
-    // TODO Found prefix (ПО and НАИ in russian language).
-    // Then search lemmas for the rest part of the word.
-    // If and here we found nothing -- search for "#" + word (sic! not the
-    // new_word).
+            // TODO Add search for # + new_word.
+            // TODO Add search for prefix, and then for lemmas (with # and
+            // without).
+        }
+    }
+
+    return false;
 }
