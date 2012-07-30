@@ -118,13 +118,6 @@ void analyzer_free(Analyzer * analyzer);
 bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size, char prefix);
 
 /*
-    Searches predict prefixes for word.
-    Returns pointer to the begining of the word without prefix. If nothing found
-    returns NULL pointer.
-*/
-char * analyzer_search_predict_prefixes(Analyzer * analyzer, char * word);
-
-/*
     Analyzer's main function for morph. analysis.
 */
 bool analyzer_get_word_info(Analyzer * analyzer, char * word, int word_size);

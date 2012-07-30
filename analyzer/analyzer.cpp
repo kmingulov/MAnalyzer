@@ -134,39 +134,34 @@ bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size, cha
     return result;
 }
 
-// Searches predict prefix for the word.
-char * analyzer_search_predict_prefixes(Analyzer * analyzer, char * word)
+//******************************************************************************
+// HELPFULL STATIC FUNCTIONS.
+//******************************************************************************
+static bool analyzer_analyze_lemma(Analyzer * analyzer, char * word, int word_size, char prefix)
 {
-    // Root of dictionary.
-    dawgdic::BaseType index = analyzer -> predict_prefixes.root();
+    // Search lemmas for word.
+    if(analyzer_search_lemmas(analyzer, word, word_size, prefix))
+        return true;
 
-    // Prefix matching in the predict prefixes DAWG dic.
-    for(char *q = word; *q != '\0'; q++)
-    {
-        // Following a transition.
-        if(!analyzer -> predict_prefixes.Follow(*q, &index))
-            break;
+    // Search lemmas for # + word.
+    char new_word[word_size + 2];
+    new_word[0] = '#';
+    strcpy(&new_word[1], word); // TODO Maybe slow. Need to write spec. function.
+    if(analyzer_search_lemmas(analyzer, &new_word[0], word_size + 1, prefix))
+        return true;
 
-        // Found a prefix?
-        if(analyzer -> predict_prefixes.has_value(index))
-        {
-            // Debug information.
-            #ifdef ANALYZER_DEBUG
-                // Cutting off the begining.
-                char old_char = *(q + 1);
-                *(q + 1) = '\0';
+    return false;
+}
 
-                printf("Predict prefix is %s\n", word);
+static bool analyzer_analyze_word(Analyzer * analyzer, char * word, int word_size)
+{
+    // Analyze word (without searching prefix).
+    if(analyzer_analyze_lemma(analyzer, word, word_size, 1))
+        return true;
 
-                // Restoring the char.
-                *(q + 1) = old_char;
-            #endif
+    // Search prefix and analyze the rest part of the word.
 
-            return q + 1;
-        }
-    }
-
-    return NULL;
+    return false;
 }
 
 //******************************************************************************
@@ -174,9 +169,11 @@ char * analyzer_search_predict_prefixes(Analyzer * analyzer, char * word)
 //******************************************************************************
 bool analyzer_get_word_info(Analyzer * analyzer, char * word, int word_size)
 {
-    // TODO Add search without predict prefix.
+    // Analyze whole word.
+    if(analyzer_analyze_word(analyzer, word, word_size))
+        return true;
 
-    // For each predict prefix, what we found...
+    // Analyze word without predict prefix.
     dawgdic::BaseType index = analyzer -> predict_prefixes.root();
     for(char *q = word; *q != '\0'; q++)
     {
@@ -201,13 +198,8 @@ bool analyzer_get_word_info(Analyzer * analyzer, char * word, int word_size)
             char * new_word = q + 1;
             int new_word_size = word_size - (q + 1 - word);
 
-            // Now search for lemmas (without prefix).
-            if(analyzer_search_lemmas(analyzer, new_word, new_word_size, 1))
+            if(analyzer_analyze_word(analyzer, new_word, new_word_size))
                 return true;
-
-            // TODO Add search for # + new_word.
-            // TODO Add search for prefix, and then for lemmas (with # and
-            // without).
         }
     }
 
