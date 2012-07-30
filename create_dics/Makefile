@@ -8,9 +8,10 @@ all: lemmas_and_prefixes lemmas_rules rules_split_and_sort rules_dics
 	mkdir -p temp
 
 	# Preparing data from sqlite-base.
-	# Lemmas and prefixes.
+	# Lemmas, predict prefixes and just prefixes.
 	$(SQLITE) sqlite/lemmas.sqlite "SELECT key FROM shelf ORDER BY key;" > temp/lemmas
-	$(SQLITE) sqlite/misc.sqlite "SELECT value FROM shelf WHERE key = 'prefixes';" | sed s/", "/\\n/g | sed s/[\]\[\"]//g > temp/prefixes
+	$(SQLITE) sqlite/misc.sqlite "SELECT value FROM shelf WHERE key = 'prefixes';" | sed s/", "/\\n/g | sed s/[\]\[\"]//g > temp/predict_prefixes
+	$(SQLITE) sqlite/misc.sqlite "SELECT value FROM shelf WHERE key = 'possible_rule_prefixes'" | sed s/", "/\\n/g | sed s/[\]\[\"]//g > temp/prefixes
 	# Lemmas rules.
 	$(SQLITE) sqlite/lemmas.sqlite "SELECT value FROM shelf ORDER BY key;" | sed s/[\]\[,]//g > temp/lemmas_rules
 	# Raw rules.
@@ -19,8 +20,8 @@ all: lemmas_and_prefixes lemmas_rules rules_split_and_sort rules_dics
 	# Prepare lemmas lexicon.
 	$(RECODE) utf8..cp1251 temp/lemmas
 	# Prepare predict prefixes lexicon.
-	sort temp/prefixes > temp/prefixes_sorted
-	$(RECODE) utf8..cp1251 temp/prefixes_sorted
+	sort temp/predict_prefixes > temp/predict_prefixes_sorted
+	$(RECODE) utf8..cp1251 temp/predict_prefixes_sorted
 	# Creating dawgdics.
 	./lemmas_and_prefixes
 
@@ -52,7 +53,7 @@ all: lemmas_and_prefixes lemmas_rules rules_split_and_sort rules_dics
 	mkdir -p temp/splitted/
 	./rules_split_and_sort
 	# Convert each rule to dawgdic.
-	recode -f utf8..cp1251 temp/splitted/*
+	$(RECODE) -f utf8..cp1251 temp/splitted/*
 	mkdir -p ../dics/rules/
 	./rules_dics
 	# Add count of forms to the first line.
