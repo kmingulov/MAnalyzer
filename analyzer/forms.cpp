@@ -17,6 +17,10 @@ Forms * forms_new(int count)
 void forms_free(Forms * forms)
 {
     free(forms -> counts);
+
+    for(int i = 0; i < forms -> count; i++)
+        free(forms -> forms[i]);
+
     free(forms -> forms);
     free(forms);
 }
