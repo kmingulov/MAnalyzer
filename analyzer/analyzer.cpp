@@ -144,9 +144,10 @@ static bool analyzer_analyze_lemma(Analyzer * analyzer, char * word, int word_si
         return true;
 
     // Search lemmas for # + word.
+    // TODO Maybe slow (because of strcpy()). Need to write special function.
     char new_word[word_size + 2];
     new_word[0] = '#';
-    strcpy(&new_word[1], word); // TODO Maybe slow. Need to write spec. function.
+    strcpy(&new_word[1], word);
     if(analyzer_search_lemmas(analyzer, &new_word[0], word_size + 1, prefix))
         return true;
 
@@ -160,6 +161,26 @@ static bool analyzer_analyze_word(Analyzer * analyzer, char * word, int word_siz
         return true;
 
     // Search prefix and analyze the rest part of the word.
+    // TODO Brute method. Maybe improve it?
+    char old_char = word[2]; word[2] = '\0';
+    if(strcmp(word, "œŒ") == 0)
+    {
+        word[2] = old_char;
+        if(analyzer_analyze_lemma(analyzer, &word[2], word_size - 2, 2))
+            return true;
+    }
+
+    word[2] = old_char;
+
+    old_char = word[3]; word[3] = '\0';
+    if(strcmp(word, "Õ¿»") == 0)
+    {
+        word[3] = old_char;
+        if(analyzer_analyze_lemma(analyzer, &word[3], word_size - 3, 3))
+            return true;
+    }
+
+    word[3] = old_char;
 
     return false;
 }
