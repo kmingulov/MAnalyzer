@@ -8,8 +8,8 @@ endif
 
 KEYS = -O3
 
-ma: main.o analyzer.o lemmas_rules.o forms.o rules.o word_infos.o
-	g++ -g $(KEYS) -o ma main.o analyzer.o lemmas_rules.o forms.o rules.o word_infos.o
+ma: main.o analyzer.o lemmas_rules.o forms.o rules.o word_infos.o normal_forms.o
+	g++ -g $(KEYS) -o ma main.o analyzer.o lemmas_rules.o forms.o rules.o word_infos.o normal_forms.o
 
 main.o: main.cpp
 	g++ $(KEYS) $(DEBUG_MODE) -g -c main.cpp
@@ -28,6 +28,9 @@ forms.o: analyzer/forms.cpp
 
 word_infos.o: analyzer/word_infos.cpp
 	g++ $(KEYS) $(DEBUG_MODE) -g -c analyzer/word_infos.cpp
+
+normal_forms.o: analyzer/normal_forms.cpp
+	g++ $(KEYS) $(DEBUG_MODE) -g -c analyzer/normal_forms.cpp
 
 clean:
 	rm -f *.o ma

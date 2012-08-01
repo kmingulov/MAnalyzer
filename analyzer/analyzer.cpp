@@ -33,6 +33,9 @@ Analyzer * analyzer_new()
     // Reading rules from directory.
     result -> rules = rules_dread("dics/rules");
 
+    // Reading normal forms.
+    result -> n_forms = normal_forms_fread("dics/normal_forms");
+
     return result;
 }
 
@@ -75,7 +78,9 @@ static bool analyzer_search_endings(Analyzer * analyzer, int lemma_id, char * en
             for(int j = 0; j < count; j++)
                 if(prefix == forms[j].prefix)
                 {
-                    infos_prepend_word(buffer, NULL, 0, forms[j].id);
+                    NormalForm nf = analyzer -> n_forms[rules[i + 1]];
+                    // TODO Make word: prefix + lemma + nf.ending.
+                    infos_prepend_word(buffer, nf.ending, nf.id, forms[j].id);
                     result = true;
 
                     #ifdef ANALYZER_DEBUG

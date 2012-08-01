@@ -51,6 +51,29 @@ void infos_erase(WordInfos * wi);
 bool infos_prepend_word(WordInfos * wi, char * form, unsigned short int n_form_id, unsigned short int form_id);
 
 //******************************************************************************
+// NORMAL FORM
+//******************************************************************************
+
+// These struct are used to get normal forms of the word.
+
+struct NormalForm
+{
+    char * ending;
+    unsigned short int id;
+    char prefix;
+};
+
+/*
+    Reads normal forms from file.
+*/
+NormalForm * normal_forms_fread(const char * filename);
+
+/*
+    Frees array with normal forms.
+*/
+void normal_forms_free(NormalForm * nf);
+
+//******************************************************************************
 // LEMMAS RULES
 //******************************************************************************
 
@@ -142,6 +165,9 @@ struct Analyzer
 
     // Rules for lemmas (array with id of rules for each lemma).
     LemmasRules l_rules;
+
+    // Array with normal forms.
+    NormalForm * n_forms;
 
     // Rules.
     Rules * rules;
