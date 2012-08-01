@@ -30,8 +30,7 @@ Forms * forms_fread(const char * filename)
     FILE * file = fopen(filename, "r");
 
     int count, forms_count;
-    unsigned short int id;
-    unsigned short int prefix;
+    int id, prefix;
 
     fscanf(file, "%d", &count);
 
@@ -49,7 +48,7 @@ Forms * forms_fread(const char * filename)
         {
             fscanf(file, "%d %d", &id, &prefix);
             forms -> forms[i][j].prefix = (char) prefix;
-            forms -> forms[i][j].id = id;
+            forms -> forms[i][j].id = (unsigned short int) id;
         }
     }
 
