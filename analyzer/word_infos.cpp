@@ -42,6 +42,9 @@ void infos_erase(WordInfos * wi)
 
 bool infos_prepend_word(WordInfos * wi, char * form, unsigned short int n_form_id, unsigned short int form_id)
 {
+    if(wi == NULL)
+        return false;
+
     if(wi -> size == wi -> max_size)
     {
         wi -> prepend_error = true;
