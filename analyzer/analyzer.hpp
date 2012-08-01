@@ -41,6 +41,11 @@ WordInfos * infos_new(unsigned int max_size);
 void infos_free(WordInfos * wi);
 
 /*
+    Erase data of the infos array.
+*/
+void infos_erase(WordInfos * wi);
+
+/*
     Prepend word to infos array.
 */
 bool infos_prepend_word(WordInfos * wi, char * form, unsigned short int n_form_id, unsigned short int form_id);
