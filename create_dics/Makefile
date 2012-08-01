@@ -1,9 +1,11 @@
+# List of used software. Default *nix commands like mkdir, cat, sort and sed
+# aren't added.
 SQLITE = sqlite3
 RECODE = recode
 C = gcc
 C++ = g++
 
-all: lemmas_and_prefixes lemmas_rules rules_split_and_sort rules_dics
+all: lemmas_and_prefixes lemmas_rules rules_split_and_sort rules_dics normal_forms
 	mkdir -p ../dics
 	mkdir -p temp
 
@@ -31,7 +33,7 @@ all: lemmas_and_prefixes lemmas_rules rules_split_and_sort rules_dics
 	sed -i "1i`wc -l ../dics/lemmas_rules | cut -f1 --delimiter=' '`" ../dics/lemmas_rules
 
 	# Making gramtab.
-	sqlite3 sqlite/misc.sqlite "SELECT value FROM shelf WHERE key='gramtab'" | \
+	$(SQLITE) sqlite/misc.sqlite "SELECT value FROM shelf WHERE key='gramtab'" | \
 	# Add newlines. \
 	sed s/],\ \"/]\\n/g | \
 	# Remove quotes. \
@@ -42,14 +44,16 @@ all: lemmas_and_prefixes lemmas_rules rules_split_and_sort rules_dics
 	sort temp/raw_gramtab | cat -n > temp/gramtab
 
 	# Making rules.
-	# Add count of forms to each line and make file with normal forms.
+	# Add count of forms to each line and prepare file with normal forms.
 	cat temp/raw_rules | while read line; do \
 		forms_count=`(echo -n \`echo "$$line" | wc -w\`; echo "/3";) | bc -q`; \
 		only_first=`echo "$$line" | cut --delimiter=' ' -f1,2,3`; \
 		\
 		echo "$$forms_count $$line" >> temp/rules_with_counts; \
-		echo "$$only_first" >> ../dics/normal_forms; \
+		echo "$$only_first" >> temp/normal_forms; \
 	done;
+	# Make file with normal forms.
+	./normal_forms
 	# Add count of rules to the first line.
 	sed -i "1i`wc -l temp/rules_with_counts | cut -f1 --delimiter=' '`" temp/rules_with_counts
 	# Splitting raw rules into files and sort them.
@@ -76,6 +80,9 @@ rules_split_and_sort: rules_split_and_sort.cpp
 
 rules_dics: rules_dics.cpp
 	$(C++) -g -o rules_dics rules_dics.cpp
+
+normal_forms: normal_forms.cpp
+	$(C++) -g -o normal_forms normal_forms.cpp
 
 clean:
 	rm -rf ../dics
