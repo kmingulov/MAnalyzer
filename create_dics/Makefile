@@ -42,11 +42,14 @@ all: lemmas_and_prefixes lemmas_rules rules_split_and_sort rules_dics
 	sort temp/raw_gramtab | cat -n > temp/gramtab
 
 	# Making rules.
-	# Add count of forms to each line;
+	# Add count of forms to each line and make file with normal forms.
 	cat temp/raw_rules | while read line; do \
 		forms_count=`(echo -n \`echo "$$line" | wc -w\`; echo "/3";) | bc -q`; \
-		echo "$$forms_count $$line"; \
-	done > temp/rules_with_counts;
+		only_first=`echo "$$line" | cut --delimiter=' ' -f1,2,3`; \
+		\
+		echo "$$forms_count $$line" >> temp/rules_with_counts; \
+		echo "$$only_first" >> ../dics/normal_forms; \
+	done;
 	# Add count of rules to the first line.
 	sed -i "1i`wc -l temp/rules_with_counts | cut -f1 --delimiter=' '`" temp/rules_with_counts
 	# Splitting raw rules into files and sort them.
