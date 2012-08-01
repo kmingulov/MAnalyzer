@@ -5,6 +5,47 @@
 #include <dawgdic/dictionary.h>
 
 //******************************************************************************
+// WORDS INFO
+//******************************************************************************
+
+struct WordInfo
+{
+    // Normal form and it's gram. type.
+    char * n_form;
+    unsigned short int n_form_id;
+
+    // Gram. type of word.
+    unsigned short int form_id;
+};
+
+struct WordInfos
+{
+    // Current size and max size of array.
+    unsigned int size;
+    unsigned int max_size;
+
+    // Flag "prepend error": cannot add new element, because array is full.
+    bool prepend_error;
+
+    // Flag "prediction": these results was get by prediction. This word is
+    // unknown.
+    bool prediction;
+
+    WordInfo * infos;
+};
+
+/*
+    Create/destroy infos array.
+*/
+WordInfos * infos_new(unsigned int max_size);
+void infos_free(WordInfos * wi);
+
+/*
+    Prepend word to infos array.
+*/
+bool infos_prepend_word(WordInfos * wi, char * form, unsigned short int n_form_id, unsigned short int form_id);
+
+//******************************************************************************
 // LEMMAS RULES
 //******************************************************************************
 
@@ -115,12 +156,12 @@ void analyzer_free(Analyzer * analyzer);
     Searches lemmas for word.
     Returns true, if anything found.
 */
-bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size, char prefix);
+bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size, char prefix, WordInfos * buffer);
 
 /*
     Analyzer's main function for morph. analysis.
 */
-bool analyzer_get_word_info(Analyzer * analyzer, char * word, int word_size);
+bool analyzer_get_word_info(Analyzer * analyzer, char * word, int word_size, WordInfos * buffer);
 
 #endif
 

@@ -48,8 +48,7 @@ void analyzer_free(Analyzer * analyzer)
 //******************************************************************************
 
 // Searches lemmas by word.
-// TODO Add buffer for results.
-bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size, char prefix)
+bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size, char prefix, WordInfos * buffer)
 {
     bool result = false;
 
@@ -108,6 +107,7 @@ bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size, cha
                     for(int j = 0; j < count; j++)
                         if(prefix == forms[j].prefix)
                         {
+                            infos_prepend_word(buffer, NULL, 0, forms[j].id);
                             result = true;
 
                             #ifdef ANALYZER_DEBUG
@@ -137,10 +137,10 @@ bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size, cha
 //******************************************************************************
 // HELPFULL STATIC FUNCTIONS.
 //******************************************************************************
-static bool analyzer_analyze_lemma(Analyzer * analyzer, char * word, int word_size, char prefix)
+static bool analyzer_analyze_lemma(Analyzer * analyzer, char * word, int word_size, char prefix, WordInfos * buffer)
 {
     // Search lemmas for word.
-    if(analyzer_search_lemmas(analyzer, word, word_size, prefix))
+    if(analyzer_search_lemmas(analyzer, word, word_size, prefix, buffer))
         return true;
 
     // Search lemmas for # + word.
@@ -148,16 +148,16 @@ static bool analyzer_analyze_lemma(Analyzer * analyzer, char * word, int word_si
     char new_word[word_size + 2];
     new_word[0] = '#';
     strcpy(&new_word[1], word);
-    if(analyzer_search_lemmas(analyzer, &new_word[0], word_size + 1, prefix))
+    if(analyzer_search_lemmas(analyzer, &new_word[0], word_size + 1, prefix, buffer))
         return true;
 
     return false;
 }
 
-static bool analyzer_analyze_word(Analyzer * analyzer, char * word, int word_size)
+static bool analyzer_analyze_word(Analyzer * analyzer, char * word, int word_size, WordInfos * buffer)
 {
     // Analyze word (without searching prefix).
-    if(analyzer_analyze_lemma(analyzer, word, word_size, 1))
+    if(analyzer_analyze_lemma(analyzer, word, word_size, 1, buffer))
         return true;
 
     // Search prefix and analyze the rest part of the word.
@@ -166,7 +166,7 @@ static bool analyzer_analyze_word(Analyzer * analyzer, char * word, int word_siz
     if(strcmp(word, "ÏÎ") == 0)
     {
         word[2] = old_char;
-        if(analyzer_analyze_lemma(analyzer, &word[2], word_size - 2, 2))
+        if(analyzer_analyze_lemma(analyzer, &word[2], word_size - 2, 2, buffer))
             return true;
     }
 
@@ -176,7 +176,7 @@ static bool analyzer_analyze_word(Analyzer * analyzer, char * word, int word_siz
     if(strcmp(word, "ÍÀÈ") == 0)
     {
         word[3] = old_char;
-        if(analyzer_analyze_lemma(analyzer, &word[3], word_size - 3, 3))
+        if(analyzer_analyze_lemma(analyzer, &word[3], word_size - 3, 3, buffer))
             return true;
     }
 
@@ -188,10 +188,10 @@ static bool analyzer_analyze_word(Analyzer * analyzer, char * word, int word_siz
 //******************************************************************************
 // ANALYZER MAIN FUNCTION
 //******************************************************************************
-bool analyzer_get_word_info(Analyzer * analyzer, char * word, int word_size)
+bool analyzer_get_word_info(Analyzer * analyzer, char * word, int word_size, WordInfos * buffer)
 {
     // Analyze whole word.
-    if(analyzer_analyze_word(analyzer, word, word_size))
+    if(analyzer_analyze_word(analyzer, word, word_size, buffer))
         return true;
 
     // Analyze word without predict prefix.
@@ -219,7 +219,7 @@ bool analyzer_get_word_info(Analyzer * analyzer, char * word, int word_size)
             char * new_word = q + 1;
             int new_word_size = word_size - (q + 1 - word);
 
-            if(analyzer_analyze_word(analyzer, new_word, new_word_size))
+            if(analyzer_analyze_word(analyzer, new_word, new_word_size, buffer))
                 return true;
         }
     }
