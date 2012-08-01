@@ -30,9 +30,9 @@ void infos_free(WordInfos * wi)
 
 void infos_erase(WordInfos * wi)
 {
-    for(int i = 0; i < wi -> size; i++)
-        if(wi -> infos[i].n_form != NULL)
-            free(wi -> infos[i].n_form);
+    //~ for(int i = 0; i < wi -> size; i++)
+        //~ if(wi -> infos[i].n_form != NULL)
+            //~ free(wi -> infos[i].n_form);
 
     wi -> size = 0;
 
