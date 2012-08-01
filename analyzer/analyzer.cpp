@@ -47,6 +47,51 @@ void analyzer_free(Analyzer * analyzer)
 // HELPFULL FOR ANALYSIS
 //******************************************************************************
 
+// Searches endings for word from lemma's rules.
+static bool analyzer_search_endings(Analyzer * analyzer, int lemma_id, char * ending, int ending_len, char prefix, WordInfos * buffer)
+{
+    bool result = false;
+
+    short int * rules = analyzer -> l_rules.rules[lemma_id];
+
+    // Going through all rules for this lemma and check the ending.
+    for(int i = 0; i < rules[0]; i++)
+    {
+        #ifdef ANALYZER_DEBUG
+            printf("\tRule %d\n", rules[i + 1]);
+        #endif
+
+        // Searching ending in rule's dawgdic.
+        int value;
+        if
+        (
+            (ending_len != 0 && analyzer -> rules -> dics[rules[i + 1]].Find(ending, ending_len, &value)) ||
+            (ending_len == 0 && analyzer -> rules -> dics[rules[i + 1]].Find("*", 1, &value))
+        )
+        {
+            int count = analyzer -> rules -> forms -> counts[value];
+            FormInfo * forms = analyzer -> rules -> forms -> forms[value];
+            // Check for each prefix and forming result.
+            for(int j = 0; j < count; j++)
+                if(prefix == forms[j].prefix)
+                {
+                    infos_prepend_word(buffer, NULL, 0, forms[j].id);
+                    result = true;
+
+                    #ifdef ANALYZER_DEBUG
+                        printf("\t\tForm %d\n", forms[j].id);
+                    #endif
+
+                    #ifdef QUIET_ANALYZER_DEBUG
+                        printf("%d ", forms[j].id);
+                    #endif
+                }
+        }
+    }
+
+    return result;
+}
+
 // Searches lemmas by word.
 bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size, char prefix, WordInfos * buffer)
 {
@@ -66,7 +111,6 @@ bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size, cha
         if(analyzer -> lemmas.has_value(index))
         {
             int value = analyzer -> lemmas.value(index);
-            short int * rules = analyzer -> l_rules.rules[value];
             char * ending = q + 1;
             int ending_len = word_size - ((q + 1) - word);
 
@@ -83,43 +127,11 @@ bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size, cha
                 *(q + 1) = old_char;
 
                 // Printing ending.
-                printf("(Possibly) ending is %s (%d).\n", ending, ending_len);
+                printf("(Possible) ending is %s (%d).\n", ending, ending_len);
             #endif
 
-            // Going through all rules for this lemma and check the ending.
-            for(int i = 0; i < rules[0]; i++)
-            {
-                #ifdef ANALYZER_DEBUG
-                    printf("\tRule %d\n", rules[i + 1]);
-                #endif
-
-                // Searching ending in rule's dawgdic.
-                int value;
-                if
-                (
-                    (ending_len != 0 && analyzer -> rules -> dics[rules[i + 1]].Find(ending, ending_len, &value)) ||
-                    (ending_len == 0 && analyzer -> rules -> dics[rules[i + 1]].Find("*", 1, &value))
-                )
-                {
-                    int count = analyzer -> rules -> forms -> counts[value];
-                    FormInfo * forms = analyzer -> rules -> forms -> forms[value];
-                    // Check for each prefix and forming result.
-                    for(int j = 0; j < count; j++)
-                        if(prefix == forms[j].prefix)
-                        {
-                            infos_prepend_word(buffer, NULL, 0, forms[j].id);
-                            result = true;
-
-                            #ifdef ANALYZER_DEBUG
-                                printf("\t\tForm %d\n", forms[j].id);
-                            #endif
-
-                            #ifdef QUIET_ANALYZER_DEBUG
-                                printf("%d ", forms[j].id);
-                            #endif
-                        }
-                }
-            }
+            if(analyzer_search_endings(analyzer, value, ending, ending_len, prefix, buffer))
+                result = true;
         }
     }
 
@@ -134,6 +146,17 @@ bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size, cha
     return result;
 }
 
+// This function is very similar to analyzer_search_lemmas(). It doesn't search lemmas, it uses special lemma (#). So word is just an ending for this lemma.
+static bool analyzer_special_lemma(Analyzer * analyzer, char * word, int word_size, char prefix, WordInfos * buffer)
+{
+    #ifdef ANALYZER_DEBUG
+        printf("Use special lemma #. Whole word (%s) is ending.\n", word);
+    #endif
+
+    // TODO 0 is value of # always?
+    return analyzer_search_endings(analyzer, 0, word, word_size, prefix, buffer);
+}
+
 //******************************************************************************
 // HELPFULL STATIC FUNCTIONS.
 //******************************************************************************
@@ -144,11 +167,7 @@ static bool analyzer_analyze_lemma(Analyzer * analyzer, char * word, int word_si
         return true;
 
     // Search lemmas for # + word.
-    // TODO Maybe slow (because of strcpy()). Need to write special function.
-    char new_word[word_size + 2];
-    new_word[0] = '#';
-    strcpy(&new_word[1], word);
-    if(analyzer_search_lemmas(analyzer, &new_word[0], word_size + 1, prefix, buffer))
+    if(analyzer_special_lemma(analyzer, word, word_size, prefix, buffer))
         return true;
 
     return false;
