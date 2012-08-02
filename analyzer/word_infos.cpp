@@ -3,6 +3,40 @@
 
 #include "analyzer.hpp"
 
+//******************************************************************************
+// STRUCTS
+//******************************************************************************
+
+struct WordInfo
+{
+    // Normal form and it's gram. type.
+    char * n_form;
+    unsigned short int n_form_id;
+
+    // Grammar type of word.
+    unsigned short int form_id;
+};
+
+struct WordInfos
+{
+    // Current size and max size of array.
+    unsigned int size;
+    unsigned int max_size;
+
+    // Flag "prepend error": cannot add new element, because array is full.
+    bool prepend_error;
+
+    // Flag "prediction": these results was get by prediction. This word is
+    // unknown.
+    bool prediction;
+
+    WordInfo * infos;
+};
+
+//******************************************************************************
+// CREATION/DESTROYING
+//******************************************************************************
+
 WordInfos * infos_new(unsigned int max_size)
 {
     WordInfos * wi = (WordInfos *) malloc(sizeof(WordInfos));
@@ -28,8 +62,14 @@ void infos_free(WordInfos * wi)
     free(wi);
 }
 
+//******************************************************************************
+// CHANGING DATA
+//******************************************************************************
+
 void infos_erase(WordInfos * wi)
 {
+    // TODO This line is commentes until creation of word (normal form) in
+    // analyzer will be added.
     //~ for(int i = 0; i < wi -> size; i++)
         //~ if(wi -> infos[i].n_form != NULL)
             //~ free(wi -> infos[i].n_form);
@@ -58,4 +98,18 @@ bool infos_prepend_word(WordInfos * wi, char * form, unsigned short int n_form_i
     wi -> size++;
 
     return true;
+}
+
+//******************************************************************************
+// CHECKS OF WORD'S INFOS ARRAY STATES
+//******************************************************************************
+
+bool infos_is_prediction(WordInfos * wi)
+{
+    return wi -> prediction;
+}
+
+bool infos_have_prepend_word(WordInfos * wi)
+{
+    return wi -> prepend_error;
 }

@@ -8,47 +8,38 @@
 // WORDS INFO
 //******************************************************************************
 
-struct WordInfo
-{
-    // Normal form and it's gram. type.
-    char * n_form;
-    unsigned short int n_form_id;
-
-    // Gram. type of word.
-    unsigned short int form_id;
-};
-
-struct WordInfos
-{
-    // Current size and max size of array.
-    unsigned int size;
-    unsigned int max_size;
-
-    // Flag "prepend error": cannot add new element, because array is full.
-    bool prepend_error;
-
-    // Flag "prediction": these results was get by prediction. This word is
-    // unknown.
-    bool prediction;
-
-    WordInfo * infos;
-};
+/*
+    Word's infos. This struct contains information about normal forms of the
+    word (forms and their grammar types).
+*/
+struct WordInfos;
 
 /*
-    Create/destroy infos array.
+    Creates/destroys infos array.
 */
 WordInfos * infos_new(unsigned int max_size);
 void infos_free(WordInfos * wi);
 
 /*
-    Erase data of the infos array.
+    Erases data of the infos array.
 */
 void infos_erase(WordInfos * wi);
 
 /*
-    Prepend word to infos array.
+    Prepends word to infos array.
 */
 bool infos_prepend_word(WordInfos * wi, char * form, unsigned short int n_form_id, unsigned short int form_id);
+
+/*
+    Check: the array with results is prediction or not.
+*/
+bool infos_is_prediction(WordInfos * wi);
+
+/*
+    Check: the array with results is full and there was an error with adding new
+    elements (there is no enough space for them).
+*/
+bool infos_have_prepend_error(WordInfos * wi);
 
 //******************************************************************************
 // NORMAL FORM
@@ -153,6 +144,28 @@ void rules_free(Rules * rules);
 //******************************************************************************
 // ANALYZER
 //******************************************************************************
+
+/*
+    Analyzed word (used in inner analyzers functions).
+*/
+struct AnalyzedWord
+{
+    // Whole word and size.
+    char * word;
+    unsigned int word_size;
+
+    // Pointers to the beginnings of word's parts.
+    char * lemma, ending, prefix;
+
+    // Lengths of word's parts.
+    unsigned int predict_prefix_len, prefix_len, lemma_len, ending_len;
+
+    // Prefix type.
+    unsigned int prefix_type;
+
+    // Array with infos.
+    WordInfos * infos;
+};
 
 /*
     Morph analyzer's struct.
