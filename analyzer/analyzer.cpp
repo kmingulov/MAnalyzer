@@ -51,8 +51,9 @@ void analyzer_free(Analyzer * analyzer)
 //******************************************************************************
 
 // Searches endings for word from lemma's rules.
-static bool analyzer_search_endings(Analyzer * analyzer, int lemma_id, char * ending, int ending_len, char prefix, WordInfos * buffer)
+static bool analyzer_search_endings(Analyzer * analyzer, char * word, int lemma_len, int lemma_id, int ending_len, char prefix, WordInfos * buffer)
 {
+    char * ending = &word[lemma_len];
     bool result = false;
 
     short int * rules = lemmas_rules_get(analyzer -> l_rules, lemma_id);
@@ -118,7 +119,8 @@ bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size, cha
         // If found a lemma, trying to get ids for it.
         if(analyzer -> lemmas.has_value(index))
         {
-            int value = analyzer -> lemmas.value(index);
+            int lemma_id = analyzer -> lemmas.value(index);
+            int lemma_len = q + 1 - word;
             char * ending = q + 1;
             int ending_len = word_size - ((q + 1) - word);
 
@@ -129,7 +131,7 @@ bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size, cha
                 *(q + 1) = '\0';
 
                 // Printing lemma.
-                printf("Lemma %s (%d). ", word, value);
+                printf("Lemma %s (%d, %d). ", word, lemma_len, lemma_id);
 
                 // Restore char.
                 *(q + 1) = old_char;
@@ -138,7 +140,7 @@ bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size, cha
                 printf("(Possible) ending is %s (%d).\n", ending, ending_len);
             #endif
 
-            if(analyzer_search_endings(analyzer, value, ending, ending_len, prefix, buffer))
+            if(analyzer_search_endings(analyzer, word, lemma_len, lemma_id, ending_len, prefix, buffer))
                 result = true;
         }
     }
@@ -162,7 +164,10 @@ static bool analyzer_special_lemma(Analyzer * analyzer, char * word, int word_si
     #endif
 
     // TODO 0 is value of # always?
-    return analyzer_search_endings(analyzer, 0, word, word_size, prefix, buffer);
+
+    // Length of lemma is equal to 0 only for special (#) lemma.
+    int lemma_len = 0, lemma_id = 0;
+    return analyzer_search_endings(analyzer, word, lemma_len, lemma_id, word_size, prefix, buffer);
 }
 
 //******************************************************************************
