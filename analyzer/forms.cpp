@@ -3,6 +3,24 @@
 
 #include "analyzer.hpp"
 
+//******************************************************************************
+// STRUCTS
+//******************************************************************************
+
+// Defined in forms.hpp file.
+struct FormInfo;
+
+struct Forms
+{
+    int count;
+    char * counts;
+    FormInfo ** forms;
+};
+
+//******************************************************************************
+// CREATING/DESTROYING
+//******************************************************************************
+
 Forms * forms_new(int count)
 {
     Forms * forms = (Forms *) malloc(sizeof(Forms));
@@ -24,6 +42,10 @@ void forms_free(Forms * forms)
     free(forms -> forms);
     free(forms);
 }
+
+//******************************************************************************
+// LOADING
+//******************************************************************************
 
 Forms * forms_fread(const char * filename)
 {
@@ -55,4 +77,18 @@ Forms * forms_fread(const char * filename)
     fclose(file);
 
     return forms;
+}
+
+//******************************************************************************
+// RETRIEVE DATA
+//******************************************************************************
+
+char forms_get_length(Forms * forms, unsigned int id)
+{
+    return forms -> counts[id];
+}
+
+FormInfo * forms_get_form_infos(Forms * forms, unsigned int id)
+{
+    return forms -> forms[id];
 }

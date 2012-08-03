@@ -72,8 +72,8 @@ static bool analyzer_search_endings(Analyzer * analyzer, int lemma_id, char * en
             (ending_len == 0 && analyzer -> rules -> dics[rules[i + 1]].Find("*", 1, &value))
         )
         {
-            int count = analyzer -> rules -> forms -> counts[value];
-            FormInfo * forms = analyzer -> rules -> forms -> forms[value];
+            int count = forms_get_length(analyzer -> rules -> forms, value);
+            FormInfo * forms = forms_get_form_infos(analyzer -> rules -> forms, value);
             // Check for each prefix and forming result.
             for(int j = 0; j < count; j++)
                 if(prefix == forms[j].prefix)
