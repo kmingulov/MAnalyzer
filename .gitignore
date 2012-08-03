@@ -5,6 +5,10 @@
 .*
 !.gitignore
 
+* Files for tests.
+input*
+result*
+
 # Executable files.
 ma
 create_dics/lemmas_rules
