@@ -138,7 +138,7 @@ bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size, cha
                 printf("(Possible) ending is %s (%d).\n", ending, ending_len);
             #endif
 
-            if(analyzer_search_endings(analyzer, value, word, ending_len, prefix, buffer))
+            if(analyzer_search_endings(analyzer, value, ending, ending_len, prefix, buffer))
                 result = true;
         }
     }

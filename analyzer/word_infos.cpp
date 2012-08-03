@@ -54,9 +54,9 @@ WordInfos * infos_new(unsigned int max_size)
 
 void infos_free(WordInfos * wi)
 {
-    for(int i = 0; i < wi -> size; i++)
-        if(wi -> infos[i].n_form != NULL)
-            free(wi -> infos[i].n_form);
+    //~ for(int i = 0; i < wi -> size; i++)
+        //~ if(wi -> infos[i].n_form != NULL)
+            //~ free(wi -> infos[i].n_form);
 
     free(wi -> infos);
     free(wi);
