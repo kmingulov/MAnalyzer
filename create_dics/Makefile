@@ -55,6 +55,7 @@ all: lemmas_and_prefixes lemmas_rules rules_split_and_sort rules_dics normal_for
 	# Make file with normal forms and add amount of them to the first line.
 	./normal_forms
 	sed -i "1i`wc -l ../dics/normal_forms | cut -f1 --delimiter=' '`" ../dics/normal_forms
+	$(RECODE) -f utf8..cp1251 ../dics/normal_forms
 	# Add count of rules to the first line.
 	sed -i "1i`wc -l temp/rules_with_counts | cut -f1 --delimiter=' '`" temp/rules_with_counts
 	# Splitting raw rules into files and sort them.
