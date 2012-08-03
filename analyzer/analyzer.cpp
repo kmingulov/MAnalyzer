@@ -55,7 +55,7 @@ static bool analyzer_search_endings(Analyzer * analyzer, int lemma_id, char * en
 {
     bool result = false;
 
-    short int * rules = analyzer -> l_rules.rules[lemma_id];
+    short int * rules = lemmas_rules_get(analyzer -> l_rules, lemma_id);
 
     // Going through all rules for this lemma and check the ending.
     for(int i = 0; i < rules[0]; i++)
@@ -78,9 +78,12 @@ static bool analyzer_search_endings(Analyzer * analyzer, int lemma_id, char * en
             for(int j = 0; j < count; j++)
                 if(prefix == forms[j].prefix)
                 {
-                    NormalForm nf = analyzer -> n_forms[rules[i + 1]];
                     // TODO Make word: prefix + lemma + nf.ending.
-                    infos_prepend_word(buffer, nf.ending, nf.id, forms[j].id);
+                    infos_prepend_word(buffer, 
+                        normal_forms_get_ending(analyzer -> n_forms, rules[i + 1]),
+                        normal_forms_get_type(analyzer -> n_forms, rules[i + 1]),
+                        forms[j].id);
+
                     result = true;
 
                     #ifdef ANALYZER_DEBUG

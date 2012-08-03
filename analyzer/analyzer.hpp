@@ -45,14 +45,11 @@ bool infos_have_prepend_error(WordInfos * wi);
 // NORMAL FORM
 //******************************************************************************
 
-// These struct are used to get normal forms of the word.
-
-struct NormalForm
-{
-    char * ending;
-    unsigned short int id;
-    char prefix;
-};
+/*
+    This struct contains information about normal form of the word: ending,
+    grammar type and prefix.
+*/
+struct NormalForm;
 
 /*
     Reads normal forms from file.
@@ -64,25 +61,37 @@ NormalForm * normal_forms_fread(const char * filename);
 */
 void normal_forms_free(NormalForm * nf);
 
+/*
+    Gets data of normal form.
+*/
+char * normal_forms_get_ending(NormalForm * nf, unsigned int id);
+unsigned short int normal_forms_get_type(NormalForm * nf, unsigned int id);
+char normal_forms_get_prefix(NormalForm * nf, unsigned int id);
+
 //******************************************************************************
 // LEMMAS RULES
 //******************************************************************************
 
-struct LemmasRules
-{
-    int count;
-    short int ** rules;
-};
+/*
+    Struct of lemmas rules. This struct compare each lemma id to ids of it's
+    rules.
+*/
+struct LemmasRules;
 
 /*
     Reads lemmas rules from file.
 */
-LemmasRules lemmas_rules_fread(const char * filename);
+LemmasRules * lemmas_rules_fread(const char * filename);
 
 /*
     Frees allocated memory in lemmas rules. (They become useless.)
 */
-void lemmas_rules_free(LemmasRules rules);
+void lemmas_rules_free(LemmasRules * rules);
+
+/*
+    Gets the pointer to the array with ids of rules.
+*/
+short int * lemmas_rules_get(LemmasRules * rules, unsigned int lemma_id);
 
 //******************************************************************************
 // FORMS
@@ -177,7 +186,7 @@ struct Analyzer
     dawgdic::Dictionary lemmas;
 
     // Rules for lemmas (array with id of rules for each lemma).
-    LemmasRules l_rules;
+    LemmasRules * l_rules;
 
     // Array with normal forms.
     NormalForm * n_forms;
