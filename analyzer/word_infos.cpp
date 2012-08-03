@@ -54,9 +54,9 @@ WordInfos * infos_new(unsigned int max_size)
 
 void infos_free(WordInfos * wi)
 {
-    //~ for(int i = 0; i < wi -> size; i++)
-        //~ if(wi -> infos[i].n_form != NULL)
-            //~ free(wi -> infos[i].n_form);
+    for(int i = 0; i < wi -> size; i++)
+        if(wi -> infos[i].n_form != NULL)
+            free(wi -> infos[i].n_form);
 
     free(wi -> infos);
     free(wi);
@@ -68,11 +68,9 @@ void infos_free(WordInfos * wi)
 
 void infos_erase(WordInfos * wi)
 {
-    // TODO This line is commentes until creation of word (normal form) in
-    // analyzer will be added.
-    //~ for(int i = 0; i < wi -> size; i++)
-        //~ if(wi -> infos[i].n_form != NULL)
-            //~ free(wi -> infos[i].n_form);
+    for(int i = 0; i < wi -> size; i++)
+        if(wi -> infos[i].n_form != NULL)
+            free(wi -> infos[i].n_form);
 
     wi -> size = 0;
 

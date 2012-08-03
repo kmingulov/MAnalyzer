@@ -79,16 +79,30 @@ static bool analyzer_search_endings(Analyzer * analyzer, char * word, int lemma_
             for(int j = 0; j < count; j++)
                 if(prefix == forms[j].prefix)
                 {
-                    // TODO Make word: prefix + lemma + nf.ending.
-                    infos_prepend_word(buffer, 
-                        normal_forms_get_ending(analyzer -> n_forms, rules[i + 1]),
+                    // TODO Need I to add prefix?
+
+                    // Counting length of normal_form word.
+                    char * nf_ending = normal_forms_get_ending(analyzer -> n_forms, rules[i + 1]);
+                    int nf_ending_len = strlen(nf_ending); // TODO Is slow?
+                    int nf_len = lemma_len + nf_ending_len;
+
+                    // Creating new char string -- word in normal form.
+                    char * nf = (char *) malloc(sizeof(char) * (nf_len + 1));
+
+                    // Copying lemma.
+                    memcpy(nf, word, lemma_len * sizeof(char));
+                    memcpy(&nf[lemma_len], nf_ending, nf_ending_len * sizeof(char));
+                    nf[nf_len] = '\0';
+
+                    infos_prepend_word(buffer,
+                        nf,
                         normal_forms_get_type(analyzer -> n_forms, rules[i + 1]),
                         forms[j].id);
 
                     result = true;
 
                     #ifdef ANALYZER_DEBUG
-                        printf("\t\tForm %d\n", forms[j].id);
+                        printf("\t\tForm %d (normal = %s)\n", forms[j].id, nf);
                     #endif
 
                     #ifdef QUIET_ANALYZER_DEBUG
@@ -205,7 +219,7 @@ static bool analyzer_analyze_word(Analyzer * analyzer, char * word, int word_siz
     word[2] = old_char;
 
     old_char = word[3]; word[3] = '\0';
-    if(strcmp(word, "Õ¿»") == 0)
+    if(strcmp(word, "Õ¿Ë") == 0)
     {
         word[3] = old_char;
         if(analyzer_analyze_lemma(analyzer, &word[3], word_size - 3, 3, buffer))
