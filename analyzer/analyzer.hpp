@@ -41,6 +41,18 @@ bool infos_is_prediction(WordInfos * wi);
 */
 bool infos_have_prepend_error(WordInfos * wi);
 
+/*
+    Gets amount of added words.
+*/
+int infos_get_size(WordInfos * wi);
+
+/*
+    These functions get info with id from word's infos.
+*/
+char * infos_get_normal_form(WordInfos * wi, unsigned int id);
+unsigned short int infos_get_normal_form_id(WordInfos * wi, unsigned int id);
+unsigned short int infos_get_form_id(WordInfos * wi, unsigned int id);
+
 //******************************************************************************
 // NORMAL FORM
 //******************************************************************************

@@ -99,6 +99,30 @@ bool infos_prepend_word(WordInfos * wi, char * form, unsigned short int n_form_i
 }
 
 //******************************************************************************
+// GETTING DATA
+//******************************************************************************
+
+int infos_get_size(WordInfos * wi)
+{
+    return wi -> size;
+}
+
+char * infos_get_normal_form(WordInfos * wi, unsigned int id)
+{
+    return wi -> infos[id].n_form;
+}
+
+unsigned short int infos_get_normal_form_id(WordInfos * wi, unsigned int id)
+{
+    return wi -> infos[id].n_form_id;
+}
+
+unsigned short int infos_get_form_id(WordInfos * wi, unsigned int id)
+{
+    return wi -> infos[id].form_id;
+}
+
+//******************************************************************************
 // CHECKS OF WORD'S INFOS ARRAY STATES
 //******************************************************************************
 
