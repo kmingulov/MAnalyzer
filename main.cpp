@@ -13,6 +13,8 @@ void analyze_file(Analyzer * analyzer, const char * filename)
     std::ifstream input(filename);
     std::string str;
 
+    WordInfos * wi = infos_new(1024);
+
     // Reading all file to the memory.
     while(input >> str)
     {
@@ -24,35 +26,45 @@ void analyze_file(Analyzer * analyzer, const char * filename)
 
     int len = text.size();
     for(int i = 0; i < len; i++)
-        if(analyzer_get_word_info(analyzer, text[i], sizes[i], NULL))
+    {
+        if(analyzer_get_word_info(analyzer, text[i], sizes[i], wi))
         {
             //~ printf("%d\n", 1);
         }
         else
         {
-            printf("%s\n", text[i]);
+            //~ printf("%s\n", text[i]);
             //~ printf("%d\n", 0);
         }
+        infos_erase(wi);
+    }
 }
 
 int main()
 {
     Analyzer * analyzer = analyzer_new();
 
-    //~ analyze_file(analyzer, "input2");
+    //~ analyze_file(analyzer, "input");
 
-    char word[] = {"ÄÎÐÎÃÎÞ"};
+    char buffer[1024];
     WordInfos * wi = infos_new(1024);
-    int word_size = strlen(word);
-    if(analyzer_get_word_info(analyzer, word, word_size, wi))
-        std::cout << "Found: ";
 
-    for(int i = 0; i < wi -> size; i++)
-        std::cout << "\t" << wi -> infos[i].n_form << "\t" << wi -> infos[i].n_form_id << " " << wi -> infos[i].form_id << std::endl;
+    while(fgets(&buffer[0], 1024, stdin))
+    {
+        int len = strlen(&buffer[0]) - 1;
+        buffer[len] = '\0';
 
-    infos_free(wi);
-
-    //~ std::cout << "!\n"; std::cin >> word[0];
+        if(!analyzer_get_word_info(analyzer, &buffer[0], len, wi))
+            std::cout << "\tÑëîâî íå íàéäåíî.\n";
+        else
+        {
+            for(int i = 0; i < infos_get_size(wi); i++)
+                std::cout << "\t" << infos_get_normal_form(wi, i) << 
+                    "\t" << infos_get_normal_form_id(wi, i) << 
+                    "\t" << infos_get_form_id(wi, i) << "\n";
+            infos_erase(wi);
+        }
+    }
 
     analyzer_free(analyzer);
 
