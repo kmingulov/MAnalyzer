@@ -1,9 +1,13 @@
-WordInfos ----|--------------------------> user
-              |
 Forms --------|
               |
-Rules --------|-----> Analyzer ----------> user
-              |
 NormalForms --|
+              |
+Rules --------|-----> Analyzer ----------> user
+              |          ^
+              |          |
+              |     AnalyzedWord
+              |          ^
+              |          |
+WordInfos ----|----------|---------------> user
               |
 LemmasRules --|

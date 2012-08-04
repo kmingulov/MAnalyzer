@@ -1,11 +1,27 @@
 #ifndef ANALYZED_WORD_HPP
 #define ANALYZED_WORD_HPP
 
+#include "word_infos.hpp"
+
 /*
     Analyzed word. Used in static analyzer's functions.
     Contains information about word.
 */
-struct AnalyzedWord;
+struct AnalyzedWord
+{
+    // Whole word and size.
+    char * word;
+    unsigned int word_size;
+
+    // Lengths of word's parts.
+    int predict_prefix_len, prefix_len, lemma_len, ending_len;
+
+    // Prefix type.
+    int prefix_type;
+
+    // Array with infos.
+    WordInfos * infos;
+};
 
 /*
     Creates new analyzed word.

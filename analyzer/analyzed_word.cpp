@@ -4,24 +4,10 @@
 #include "analyzed_word.hpp"
 
 //******************************************************************************
-// STRUCT
+// STRUCT (DEFINED IN ANALYZED_WORD.HPP)
 //******************************************************************************
 
-struct AnalyzedWord
-{
-    // Whole word and size.
-    char * word;
-    unsigned int word_size;
-
-    // Lengths of word's parts.
-    int predict_prefix_len, prefix_len, lemma_len, ending_len;
-
-    // Prefix type.
-    int prefix_type;
-
-    // Array with infos.
-    WordInfos * infos;
-};
+struct AnalyzedWord;
 
 //******************************************************************************
 // CREATION/DESTROYING
@@ -36,12 +22,12 @@ AnalyzedWord * analyzed_word_new(char * word, unsigned int word_size, WordInfos 
     aw -> word_size = word_size;
     aw -> infos = buffer;
 
-    // Make -1 everything else. -1 means "not defined".
-    aw -> predict_prefix_len = -1;
-    aw -> prefix_len = -1;
-    aw -> lemma_len = -1;
-    aw -> ending_len = -1;
-    aw -> prefix_type = -1;
+    // Make 0 everything else. 0 means "not defined".
+    aw -> predict_prefix_len = 0;
+    aw -> prefix_len = 0;
+    aw -> lemma_len = 0;
+    aw -> ending_len = 0;
+    aw -> prefix_type = 0;
 
     return aw;
 }

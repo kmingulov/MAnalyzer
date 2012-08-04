@@ -8,6 +8,8 @@
 #include "rules.hpp"
 #include "lemmas_rules.hpp"
 #include "normal_forms.hpp"
+#include "analyzed_word.hpp"
+
 #include "analyzer.hpp"
 
 //******************************************************************************
@@ -232,10 +234,14 @@ static bool analyzer_analyze_lemma(Analyzer * analyzer, char * word, int word_si
     return false;
 }
 
-static bool analyzer_analyze_word(Analyzer * analyzer, char * word, int word_size, WordInfos * buffer)
+static bool analyzer_analyze_word(Analyzer * analyzer, AnalyzedWord * aw)
 {
+    // Now analyze word without predict prefix.
+    char * word = &(aw -> word[aw -> predict_prefix_len]);
+    int word_size = aw -> word_size - aw -> predict_prefix_len;
+
     // Analyze word (without searching prefix).
-    if(analyzer_analyze_lemma(analyzer, word, word_size, 1, buffer))
+    if(analyzer_analyze_lemma(analyzer, word, word_size, 1, aw -> infos))
         return true;
 
     // Search prefix and analyze the rest part of the word.
@@ -244,17 +250,17 @@ static bool analyzer_analyze_word(Analyzer * analyzer, char * word, int word_siz
     if(strcmp(word, "ÏÎ") == 0)
     {
         word[2] = old_char;
-        if(analyzer_analyze_lemma(analyzer, &word[2], word_size - 2, 2, buffer))
+        if(analyzer_analyze_lemma(analyzer, &word[2], word_size - 2, 2, aw -> infos))
             return true;
     }
 
     word[2] = old_char;
 
     old_char = word[3]; word[3] = '\0';
-    if(strcmp(word, "ÍÀè") == 0)
+    if(strcmp(word, "ÍÀÈ") == 0)
     {
         word[3] = old_char;
-        if(analyzer_analyze_lemma(analyzer, &word[3], word_size - 3, 3, buffer))
+        if(analyzer_analyze_lemma(analyzer, &word[3], word_size - 3, 3, aw -> infos))
             return true;
     }
 
@@ -266,11 +272,16 @@ static bool analyzer_analyze_word(Analyzer * analyzer, char * word, int word_siz
 //******************************************************************************
 // ANALYZER MAIN FUNCTION
 //******************************************************************************
-bool analyzer_get_word_info(Analyzer * analyzer, char * word, int word_size, WordInfos * buffer)
+bool analyzer_get_word_info(Analyzer * analyzer, char * word, unsigned int word_size, WordInfos * buffer)
 {
+    AnalyzedWord * aw = analyzed_word_new(word, word_size, buffer);
+
     // Analyze whole word.
-    if(analyzer_analyze_word(analyzer, word, word_size, buffer))
+    if(analyzer_analyze_word(analyzer, aw))
+    {
+        analyzed_word_free(aw);
         return true;
+    }
 
     // Analyze word without predict prefix.
     dawgdic::BaseType index = analyzer -> predict_prefixes.root();
@@ -294,13 +305,16 @@ bool analyzer_get_word_info(Analyzer * analyzer, char * word, int word_size, Wor
                 *(q + 1) = old_char;
             #endif
 
-            char * new_word = q + 1;
-            int new_word_size = word_size - (q + 1 - word);
+            aw -> predict_prefix_len = q + 1 - word;
 
-            if(analyzer_analyze_word(analyzer, new_word, new_word_size, buffer))
+            if(analyzer_analyze_word(analyzer, aw))
+            {
+                analyzed_word_free(aw);
                 return true;
+            }
         }
     }
 
+    analyzed_word_free(aw);
     return false;
 }

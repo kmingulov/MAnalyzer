@@ -21,15 +21,9 @@ Analyzer * analyzer_new();
 void analyzer_free(Analyzer * analyzer);
 
 /*
-    Searches lemmas for word.
-    Returns true, if anything found.
-*/
-bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size, char prefix, WordInfos * buffer);
-
-/*
     Analyzer's main function for morph. analysis.
 */
-bool analyzer_get_word_info(Analyzer * analyzer, char * word, int word_size, WordInfos * buffer);
+bool analyzer_get_word_info(Analyzer * analyzer, char * word, unsigned int word_size, WordInfos * buffer);
 
 #endif
 
