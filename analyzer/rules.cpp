@@ -3,16 +3,29 @@
 #include <cstring>
 #include <fstream>
 
+#include "forms.hpp"
 #include "rules.hpp"
+
+//******************************************************************************
+// STRUCT
+//******************************************************************************
+
+struct Rules
+{
+    // Dics (with endings) for rules.
+    // TODO Constant?
+    dawgdic::Dictionary dics[2766];
+};
+
+//******************************************************************************
+// CREATION/DESTROYING
+//******************************************************************************
 
 Rules * rules_dread(const char * dirname)
 {
     Rules * rules = new Rules;
 
     char path[1024];
-    sprintf(&path[0], "%s/forms", dirname);
-
-    rules -> forms = forms_fread(&path[0]);
 
     // TODO Constant?
     for(int i = 0; i < 2766; i++)
@@ -28,6 +41,14 @@ Rules * rules_dread(const char * dirname)
 
 void rules_free(Rules * rules)
 {
-    forms_free(rules -> forms);
     delete rules;
+}
+
+//******************************************************************************
+// GETTING INFO
+//******************************************************************************
+
+bool rules_find_ending_in_rule(Rules * rules, unsigned int id, const char * ending, int ending_len, int * buffer)
+{
+    return rules -> dics[id].Find(ending, ending_len, buffer);
 }

@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cstring>
 
+#include "forms.hpp"
 #include "rules.hpp"
 #include "lemmas_rules.hpp"
 #include "normal_forms.hpp"
@@ -24,6 +25,9 @@ struct Analyzer
 
     // Array with normal forms.
     NormalForms * n_forms;
+
+    // All forms.
+    Forms * forms;
 
     // Rules.
     Rules * rules;
@@ -53,6 +57,9 @@ Analyzer * analyzer_new()
     // Reading lemmas rules (connects each lemma's id to it's rules).
     result -> l_rules = lemmas_rules_fread("dics/lemmas_rules");
 
+    // Reading all forms from file.
+    result -> forms = forms_fread("dics/rules/forms");
+
     // Reading rules from directory.
     result -> rules = rules_dread("dics/rules");
 
@@ -65,6 +72,7 @@ Analyzer * analyzer_new()
 void analyzer_free(Analyzer * analyzer)
 {
     lemmas_rules_free(analyzer -> l_rules);
+    forms_free(analyzer -> forms);
     rules_free(analyzer -> rules);
     normal_forms_free(analyzer -> n_forms);
     delete analyzer;
@@ -93,17 +101,17 @@ static bool analyzer_search_endings(Analyzer * analyzer, char * word, int lemma_
         int value;
         if
         (
-            (ending_len != 0 && analyzer -> rules -> dics[rules[i + 1]].Find(ending, ending_len, &value)) ||
-            (ending_len == 0 && analyzer -> rules -> dics[rules[i + 1]].Find("*", 1, &value))
+            (ending_len != 0 && rules_find_ending_in_rule(analyzer -> rules, rules[i + 1], ending, ending_len, &value)) ||
+            (ending_len == 0 && rules_find_ending_in_rule(analyzer -> rules, rules[i + 1], "*", 1, &value))
         )
         {
-            int count = forms_get_length(analyzer -> rules -> forms, value);
-            FormInfo * forms = forms_get_form_infos(analyzer -> rules -> forms, value);
+            int count = forms_get_length(analyzer -> forms, value);
+            FormInfo * forms = forms_get_form_infos(analyzer -> forms, value);
             // Check for each prefix and forming result.
             for(int j = 0; j < count; j++)
                 if(prefix == forms[j].prefix)
                 {
-                    // TODO Need I to add prefix?
+                    // TODO I need to add predict_prefix.
 
                     // Counting length of normal_form word.
                     char * nf_ending = normal_forms_get_ending(analyzer -> n_forms, rules[i + 1]);

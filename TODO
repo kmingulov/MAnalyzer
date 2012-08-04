@@ -2,8 +2,6 @@ Features:
     * add prediction
 
 Code:
-    * move rules struct to the rules.cpp file
-    * split analyzer.hpp file
     * rewrite analyzer's functions() for use with AnalyzedWord
 
 Algo:

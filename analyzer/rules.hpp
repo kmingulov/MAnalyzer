@@ -3,17 +3,10 @@
 
 #include <dawgdic/dictionary.h>
 
-#include "forms.hpp"
-
-struct Rules
-{
-    // All forms.
-    Forms * forms;
-
-    // Dics (with endings) for rules.
-    // TODO Constant?
-    dawgdic::Dictionary dics[2766];
-};
+/*
+    Struct with rules. Each rule is an another dawgdic with endings-keys.
+*/
+struct Rules;
 
 /*
     Loads rules from _directory_. Each rule is in *.dawgdic file. Forms are in
@@ -25,6 +18,12 @@ Rules * rules_dread(const char * dirname);
     Frees rules.
 */
 void rules_free(Rules * rules);
+
+/*
+    Returns true if ending is in rule with id. If true, buffer will contain
+    value of this ending.
+*/
+bool rules_find_ending_in_rule(Rules * rules, unsigned int id, const char * ending, int ending_len, int * buffer);
 
 #endif
 
