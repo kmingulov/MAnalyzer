@@ -13,6 +13,9 @@ struct AnalyzedWord
     char * word;
     unsigned int word_size;
 
+    // Pointers to the beginings of the parts.
+    char * prefix, * lemma, * ending;
+
     // Lengths of word's parts.
     int predict_prefix_len, prefix_len, lemma_len, ending_len;
 

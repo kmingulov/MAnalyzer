@@ -208,7 +208,7 @@ bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size, cha
 static bool analyzer_special_lemma(Analyzer * analyzer, char * word, int word_size, char prefix, WordInfos * buffer)
 {
     #ifdef ANALYZER_DEBUG
-        printf("Use special lemma #. Whole word (%s) is ending.\n", word);
+        printf("Use special lemma #. Whole word (%s) is ending.\n", aw -> ending);
     #endif
 
     // TODO 0 is value of # always?
@@ -221,14 +221,14 @@ static bool analyzer_special_lemma(Analyzer * analyzer, char * word, int word_si
 //******************************************************************************
 // HELPFULL STATIC FUNCTIONS.
 //******************************************************************************
-static bool analyzer_analyze_lemma(Analyzer * analyzer, char * word, int word_size, char prefix, WordInfos * buffer)
+static bool analyzer_analyze_lemma(Analyzer * analyzer, AnalyzedWord * aw)
 {
     // Search lemmas for word.
-    if(analyzer_search_lemmas(analyzer, word, word_size, prefix, buffer))
+    if(analyzer_search_lemmas(analyzer, aw -> lemma, aw -> word_size - aw -> predict_prefix_len - aw -> prefix_len, aw -> prefix_type, aw -> infos))
         return true;
 
     // Search lemmas for # + word.
-    if(analyzer_special_lemma(analyzer, word, word_size, prefix, buffer))
+    if(analyzer_special_lemma(analyzer, aw -> lemma, aw -> word_size - aw -> predict_prefix_len - aw -> prefix_len, aw -> prefix_type, aw -> infos))
         return true;
 
     return false;
@@ -236,21 +236,25 @@ static bool analyzer_analyze_lemma(Analyzer * analyzer, char * word, int word_si
 
 static bool analyzer_analyze_word(Analyzer * analyzer, AnalyzedWord * aw)
 {
-    // Now analyze word without predict prefix.
-    char * word = &(aw -> word[aw -> predict_prefix_len]);
-    int word_size = aw -> word_size - aw -> predict_prefix_len;
-
     // Analyze word (without searching prefix).
-    if(analyzer_analyze_lemma(analyzer, word, word_size, 1, aw -> infos))
+    aw -> prefix_type = 1;
+    aw -> lemma = aw -> prefix;
+    if(analyzer_analyze_lemma(analyzer, aw))
         return true;
 
     // Search prefix and analyze the rest part of the word.
     // TODO Brute method. Maybe improve it?
+    char * word = aw -> prefix;
     char old_char = word[2]; word[2] = '\0';
     if(strcmp(word, "ÏÎ") == 0)
     {
         word[2] = old_char;
-        if(analyzer_analyze_lemma(analyzer, &word[2], word_size - 2, 2, aw -> infos))
+
+        aw -> prefix_type = 2;
+        aw -> prefix_len = 2;
+        aw -> lemma = aw -> prefix + 2;
+
+        if(analyzer_analyze_lemma(analyzer, aw))
             return true;
     }
 
@@ -260,7 +264,12 @@ static bool analyzer_analyze_word(Analyzer * analyzer, AnalyzedWord * aw)
     if(strcmp(word, "ÍÀÈ") == 0)
     {
         word[3] = old_char;
-        if(analyzer_analyze_lemma(analyzer, &word[3], word_size - 3, 3, aw -> infos))
+
+        aw -> prefix_type = 3;
+        aw -> prefix_len = 3;
+        aw -> lemma = aw -> prefix + 3;
+
+        if(analyzer_analyze_lemma(analyzer, aw))
             return true;
     }
 
@@ -275,6 +284,7 @@ static bool analyzer_analyze_word(Analyzer * analyzer, AnalyzedWord * aw)
 bool analyzer_get_word_info(Analyzer * analyzer, char * word, unsigned int word_size, WordInfos * buffer)
 {
     AnalyzedWord * aw = analyzed_word_new(word, word_size, buffer);
+    aw -> prefix = word;
 
     // Analyze whole word.
     if(analyzer_analyze_word(analyzer, aw))
@@ -305,6 +315,7 @@ bool analyzer_get_word_info(Analyzer * analyzer, char * word, unsigned int word_
                 *(q + 1) = old_char;
             #endif
 
+            aw -> prefix = q + 1;
             aw -> predict_prefix_len = q + 1 - word;
 
             if(analyzer_analyze_word(analyzer, aw))

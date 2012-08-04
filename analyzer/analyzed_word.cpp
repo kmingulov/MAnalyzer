@@ -23,6 +23,9 @@ AnalyzedWord * analyzed_word_new(char * word, unsigned int word_size, WordInfos 
     aw -> infos = buffer;
 
     // Make 0 everything else. 0 means "not defined".
+    aw -> prefix = NULL;
+    aw -> lemma = NULL;
+    aw -> ending = NULL;
     aw -> predict_prefix_len = 0;
     aw -> prefix_len = 0;
     aw -> lemma_len = 0;
