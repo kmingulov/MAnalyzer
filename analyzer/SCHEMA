@@ -1,0 +1,7 @@
+WordInfos --------|--------------------------> user
+                  |
+Forms --> Rules --|
+                  |-----> Analyzer ----------> user
+NormalForms ------|
+                  |
+LemmasRules ------|

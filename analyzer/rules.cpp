@@ -3,7 +3,7 @@
 #include <cstring>
 #include <fstream>
 
-#include "analyzer.hpp"
+#include "rules.hpp"
 
 Rules * rules_dread(const char * dirname)
 {

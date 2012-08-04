@@ -4,7 +4,30 @@
 #include <cstdlib>
 #include <cstring>
 
+#include "rules.hpp"
+#include "lemmas_rules.hpp"
+#include "normal_forms.hpp"
 #include "analyzer.hpp"
+
+//******************************************************************************
+// STRUCT.
+//******************************************************************************
+
+struct Analyzer
+{
+    // Prefixes' and lemmas' dictionaries.
+    dawgdic::Dictionary predict_prefixes;
+    dawgdic::Dictionary lemmas;
+
+    // Rules for lemmas (array with id of rules for each lemma).
+    LemmasRules * l_rules;
+
+    // Array with normal forms.
+    NormalForms * n_forms;
+
+    // Rules.
+    Rules * rules;
+};
 
 //******************************************************************************
 // CREATING/DESTROYING

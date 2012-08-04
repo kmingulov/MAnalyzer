@@ -4,6 +4,8 @@
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
+
+#include "analyzer/word_infos.hpp"
 #include "analyzer/analyzer.hpp"
 
 void analyze_file(Analyzer * analyzer, const char * filename)

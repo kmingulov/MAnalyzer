@@ -2,7 +2,7 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "analyzer.hpp"
+#include "lemmas_rules.hpp"
 
 //******************************************************************************
 // STRUCT

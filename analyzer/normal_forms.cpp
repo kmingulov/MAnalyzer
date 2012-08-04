@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "analyzer.hpp"
+#include "normal_forms.hpp"
 
 //******************************************************************************
 // STRUCT

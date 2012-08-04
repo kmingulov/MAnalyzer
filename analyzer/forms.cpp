@@ -1,7 +1,7 @@
 #include <cstdlib>
 #include <cstdio>
 
-#include "analyzer.hpp"
+#include "forms.hpp"
 
 //******************************************************************************
 // STRUCTS
