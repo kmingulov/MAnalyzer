@@ -38,6 +38,8 @@ void analyze_file(Analyzer * analyzer, const char * filename)
         }
         infos_erase(wi);
     }
+
+    infos_free(wi);
 }
 
 int main()
@@ -65,6 +67,8 @@ int main()
             infos_erase(wi);
         }
     }
+
+    infos_free(wi);
 
     analyzer_free(analyzer);
 

@@ -17,18 +17,26 @@ struct NormalForm
     char prefix;
 };
 
+struct NormalForms
+{
+    unsigned int count;
+    NormalForm * forms;
+};
+
 //******************************************************************************
 // CREATION/DESTROYING
 //******************************************************************************
 
-NormalForm * normal_forms_fread(const char * filename)
+NormalForms * normal_forms_fread(const char * filename)
 {
     std::ifstream input(filename);
 
-    int count;
+    unsigned int count;
     input >> count;
 
-    NormalForm * nf = (NormalForm *) malloc(sizeof(NormalForm) * count);
+    NormalForms * nf = (NormalForms *) malloc(sizeof(NormalForms));
+    nf -> count = count;
+    nf -> forms = (NormalForm *) malloc(sizeof(NormalForm) * count);
 
     std::string ending;
     unsigned short int id, prefix;
@@ -37,33 +45,40 @@ NormalForm * normal_forms_fread(const char * filename)
     {
         input >> ending >> id >> prefix;
 
-        nf[i].ending = (char *) malloc(sizeof(char) * (ending.size() + 1));
-        strcpy(nf[i].ending, ending.c_str());
+        nf -> forms[i].ending = (char *) malloc(sizeof(char) * (ending.size() + 1));
+        strcpy(nf -> forms[i].ending, ending.c_str());
 
-        nf[i].id = id;
-        nf[i].prefix = prefix;
+        nf -> forms[i].id = id;
+        nf -> forms[i].prefix = prefix;
     }
 
     return nf;
 }
 
-// TODO Write normal_forms_free() function.
+void normal_forms_free(NormalForms * nf)
+{
+    for(int i = 0; i < nf -> count; i++)
+        free(nf -> forms[i].ending);
+
+    free(nf -> forms);
+    free(nf);
+}
 
 //******************************************************************************
 // GET DATA.
 //******************************************************************************
 
-char * normal_forms_get_ending(NormalForm * nf, unsigned int id)
+char * normal_forms_get_ending(NormalForms * nf, unsigned int id)
 {
-    return nf[id].ending;
+    return nf -> forms[id].ending;
 }
 
-unsigned short int normal_forms_get_type(NormalForm * nf, unsigned int id)
+unsigned short int normal_forms_get_type(NormalForms * nf, unsigned int id)
 {
-    return nf[id].id;
+    return nf -> forms[id].id;
 }
 
-char normal_forms_get_prefix(NormalForm * nf, unsigned int id)
+char normal_forms_get_prefix(NormalForms * nf, unsigned int id)
 {
-    return nf[id].prefix;
+    return nf -> forms[id].prefix;
 }

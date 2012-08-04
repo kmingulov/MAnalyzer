@@ -43,6 +43,7 @@ void analyzer_free(Analyzer * analyzer)
 {
     lemmas_rules_free(analyzer -> l_rules);
     rules_free(analyzer -> rules);
+    normal_forms_free(analyzer -> n_forms);
     delete analyzer;
 }
 

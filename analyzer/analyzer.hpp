@@ -58,27 +58,27 @@ unsigned short int infos_get_form_id(WordInfos * wi, unsigned int id);
 //******************************************************************************
 
 /*
-    This struct contains information about normal form of the word: ending,
-    grammar type and prefix.
+    This struct contains information about normal forms (each of them contains
+    ending, id and required prefix).
 */
-struct NormalForm;
+struct NormalForms;
 
 /*
     Reads normal forms from file.
 */
-NormalForm * normal_forms_fread(const char * filename);
+NormalForms * normal_forms_fread(const char * filename);
 
 /*
     Frees array with normal forms.
 */
-void normal_forms_free(NormalForm * nf);
+void normal_forms_free(NormalForms * nf);
 
 /*
     Gets data of normal form.
 */
-char * normal_forms_get_ending(NormalForm * nf, unsigned int id);
-unsigned short int normal_forms_get_type(NormalForm * nf, unsigned int id);
-char normal_forms_get_prefix(NormalForm * nf, unsigned int id);
+char * normal_forms_get_ending(NormalForms * nf, unsigned int id);
+unsigned short int normal_forms_get_type(NormalForms * nf, unsigned int id);
+char normal_forms_get_prefix(NormalForms * nf, unsigned int id);
 
 //******************************************************************************
 // LEMMAS RULES
@@ -214,7 +214,7 @@ struct Analyzer
     LemmasRules * l_rules;
 
     // Array with normal forms.
-    NormalForm * n_forms;
+    NormalForms * n_forms;
 
     // Rules.
     Rules * rules;
