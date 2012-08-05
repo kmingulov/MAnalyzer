@@ -11,8 +11,14 @@ KEYS = -O3
 ma: main.o analyzer.o analyzed_word.o lemmas_rules.o forms.o rules.o word_infos.o normal_forms.o
 	g++ -g $(KEYS) -o ma main.o analyzer.o analyzed_word.o lemmas_rules.o forms.o rules.o word_infos.o normal_forms.o
 
+cache: with_cache.o analyzer.o analyzed_word.o lemmas_rules.o forms.o rules.o word_infos.o normal_forms.o
+	g++ -g $(KEYS) -o cache with_cache.o analyzer.o analyzed_word.o lemmas_rules.o forms.o rules.o word_infos.o normal_forms.o
+
 main.o: main.cpp
 	g++ $(KEYS) $(DEBUG_MODE) -g -c main.cpp
+
+with_cache.o: with_cache.cpp
+	g++ $(KEYS) $(DEBUG_MODE) -g -c with_cache.cpp
 
 analyzer.o: analyzer/analyzer.cpp
 	g++ $(KEYS) $(DEBUG_MODE) -g -c analyzer/analyzer.cpp

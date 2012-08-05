@@ -11,6 +11,7 @@ result*
 
 # Executable files.
 ma
+cache
 create_dics/lemmas_rules
 create_dics/lemmas_and_prefixes
 create_dics/rules_split_and_sort
