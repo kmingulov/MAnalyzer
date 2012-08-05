@@ -306,10 +306,15 @@ static bool analyzer_analyze_prefix(Analyzer * analyzer, AnalyzedWord * aw)
 //******************************************************************************
 // ANALYZER MAIN FUNCTION
 //******************************************************************************
+
+bool analyzer_predict(Analyzer * analyzer, AnalyzedWord * aw);
+
 bool analyzer_get_word_info(Analyzer * analyzer, char * word, unsigned int word_size, WordInfos * buffer)
 {
     AnalyzedWord * aw = analyzed_word_new(word, word_size, buffer);
     aw -> prefix = word;
+
+    //~ return analyzer_predict(analyzer, aw);
 
     // Analyze whole word.
     if(analyzer_analyze_prefix(analyzer, aw))
@@ -353,4 +358,21 @@ bool analyzer_get_word_info(Analyzer * analyzer, char * word, unsigned int word_
 
     analyzed_word_free(aw);
     return false;
+}
+
+//******************************************************************************
+// PREDICTION FUNCTION
+//******************************************************************************
+
+bool analyzer_predict(Analyzer * analyzer, AnalyzedWord * aw)
+{
+    // TODO Check for #+ending?
+
+    // Check the possible endings of the word (with length up to 5 letters).
+    char * end = aw -> word + aw -> word_size;
+    for(char * q = end - 1; end - q <= 5 && q >= aw -> word; q--)
+    {
+        // q is the ending now.
+        
+    }
 }

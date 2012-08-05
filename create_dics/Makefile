@@ -18,6 +18,9 @@ all: lemmas_and_prefixes lemmas_rules rules_split_and_sort rules_dics normal_for
 	$(SQLITE) sqlite/lemmas.sqlite "SELECT value FROM shelf ORDER BY key;" | sed s/[\]\[,]//g > temp/lemmas_rules
 	# Raw rules.
 	$(SQLITE) sqlite/rules.sqlite "SELECT value FROM shelf;" | sed s/\"\"/*/g | sed s/[\]\[\",]//g > temp/raw_rules
+	# Endings (for prediction).
+	$(SQLITE) sqlite/endings.sqlite "SELECT key FROM shelf ORDER BY key;" > temp/endings
+	$(SQLITE) sqlite/endings.sqlite "SELECT value FROM shelf ORDER BY key;" | sed s/"[][]"/_/g | sed s/"[\",\ ]"//g | sed s/"_[0-9]*_"//g | sed s/[{}]//g | sed s/":"/" "/g > temp/endings_rules # Seems like I know regexps horribly. TODO Make it better?
 
 	# Prepare lemmas lexicon.
 	$(RECODE) utf8..cp1251 temp/lemmas
