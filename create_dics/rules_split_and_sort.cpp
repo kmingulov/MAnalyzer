@@ -36,7 +36,7 @@ int main()
         ofstream output(&buffer[0]);
 
         input >> forms_count;
-        output << forms_count << endl;
+        //~ output << forms_count << endl;
 
         for(int j = 0; j < forms_count; j++)
         {
@@ -62,7 +62,7 @@ int main()
 
         output.close();
 
-        sprintf(&buffer[0], "cd temp/splitted/; sort -o %d_ %d; mv %d_ %d; cd ../..;", i, i, i, i);
+        sprintf(&buffer[0], "cd temp/splitted/; sort -o %d_ %d; mv %d_ %d; sed -i \"1i`wc -l %d | cut -f1 --delimiter=' '`\" %d; cd ../..;", i, i, i, i, i, i);
         system(&buffer[0]);
     }
 
