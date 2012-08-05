@@ -18,6 +18,8 @@ struct AnalyzedWord
 
     // Lengths of word's parts.
     int predict_prefix_len, prefix_len, lemma_len, ending_len;
+    // Id of the lemma.
+    int lemma_id;
 
     // Prefix type.
     int prefix_type;

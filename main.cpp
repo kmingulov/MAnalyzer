@@ -35,7 +35,7 @@ void analyze_file(Analyzer * analyzer, const char * filename)
         }
         else
         {
-            //~ printf("%s\n", text[i]);
+            printf("%s\n", text[i]);
             //~ printf("%d\n", 0);
         }
         infos_erase(wi);
@@ -48,7 +48,7 @@ int main()
 {
     Analyzer * analyzer = analyzer_new();
 
-    //~ analyze_file(analyzer, "input");
+    //~ analyze_file(analyzer, "input2");
 
     char buffer[1024];
     WordInfos * wi = infos_new(1024);

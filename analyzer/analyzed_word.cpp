@@ -31,6 +31,7 @@ AnalyzedWord * analyzed_word_new(char * word, unsigned int word_size, WordInfos 
     aw -> lemma_len = 0;
     aw -> ending_len = 0;
     aw -> prefix_type = 0;
+    aw -> lemma_id = 0;
 
     return aw;
 }

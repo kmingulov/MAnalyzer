@@ -85,12 +85,11 @@ void analyzer_free(Analyzer * analyzer)
 //******************************************************************************
 
 // Searches endings for word from lemma's rules.
-static bool analyzer_search_endings(Analyzer * analyzer, char * word, int lemma_len, int lemma_id, int ending_len, char prefix, WordInfos * buffer)
+static bool analyzer_search_endings(Analyzer * analyzer, AnalyzedWord * aw)//char * word, int lemma_len, int lemma_id, int ending_len, char prefix, WordInfos * buffer)
 {
-    char * ending = &word[lemma_len];
     bool result = false;
 
-    short int * rules = lemmas_rules_get(analyzer -> l_rules, lemma_id);
+    short int * rules = lemmas_rules_get(analyzer -> l_rules, aw -> lemma_id);
 
     // Going through all rules for this lemma and check the ending.
     for(int i = 0; i < rules[0]; i++)
@@ -103,32 +102,32 @@ static bool analyzer_search_endings(Analyzer * analyzer, char * word, int lemma_
         int value;
         if
         (
-            (ending_len != 0 && rules_find_ending_in_rule(analyzer -> rules, rules[i + 1], ending, ending_len, &value)) ||
-            (ending_len == 0 && rules_find_ending_in_rule(analyzer -> rules, rules[i + 1], "*", 1, &value))
+            (aw -> ending_len != 0 && rules_find_ending_in_rule(analyzer -> rules, rules[i + 1], aw -> ending, aw -> ending_len, &value)) ||
+            (aw -> ending_len == 0 && rules_find_ending_in_rule(analyzer -> rules, rules[i + 1], "*", 1, &value))
         )
         {
             int count = forms_get_length(analyzer -> forms, value);
             FormInfo * forms = forms_get_form_infos(analyzer -> forms, value);
             // Check for each prefix and forming result.
             for(int j = 0; j < count; j++)
-                if(prefix == forms[j].prefix)
+                if(aw -> prefix_type == forms[j].prefix)
                 {
                     // TODO I need to add predict_prefix.
 
                     // Counting length of normal_form word.
                     char * nf_ending = normal_forms_get_ending(analyzer -> n_forms, rules[i + 1]);
                     int nf_ending_len = strlen(nf_ending); // TODO Is slow?
-                    int nf_len = lemma_len + nf_ending_len;
+                    int nf_len = aw -> lemma_len + nf_ending_len;
 
                     // Creating new char string -- word in normal form.
                     char * nf = (char *) malloc(sizeof(char) * (nf_len + 1));
 
                     // Copying lemma.
-                    memcpy(nf, word, lemma_len * sizeof(char));
-                    memcpy(&nf[lemma_len], nf_ending, nf_ending_len * sizeof(char));
+                    memcpy(nf, aw -> lemma, aw -> lemma_len * sizeof(char));
+                    memcpy(&nf[aw -> lemma_len], nf_ending, nf_ending_len * sizeof(char));
                     nf[nf_len] = '\0';
 
-                    infos_prepend_word(buffer,
+                    infos_prepend_word(aw -> infos,
                         nf,
                         normal_forms_get_type(analyzer -> n_forms, rules[i + 1]),
                         forms[j].id);
@@ -150,7 +149,7 @@ static bool analyzer_search_endings(Analyzer * analyzer, char * word, int lemma_
 }
 
 // Searches lemmas by word.
-bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size, char prefix, WordInfos * buffer)
+bool analyzer_search_lemmas(Analyzer * analyzer, AnalyzedWord * aw)
 {
     bool result = false;
 
@@ -158,7 +157,7 @@ bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size, cha
     dawgdic::BaseType index = analyzer -> lemmas.root();
 
     // Prefix matching in the lemmas DAWG dic.
-    for(char *q = word; *q != '\0'; q++)
+    for(char *q = aw -> lemma; *q != '\0'; q++)
     {
         // Following the transition.
         if(!analyzer -> lemmas.Follow(*q, &index))
@@ -167,10 +166,10 @@ bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size, cha
         // If found a lemma, trying to get ids for it.
         if(analyzer -> lemmas.has_value(index))
         {
-            int lemma_id = analyzer -> lemmas.value(index);
-            int lemma_len = q + 1 - word;
-            char * ending = q + 1;
-            int ending_len = word_size - ((q + 1) - word);
+            aw -> lemma_id = analyzer -> lemmas.value(index);
+            aw -> lemma_len = q + 1 - aw -> lemma;
+            aw -> ending = q + 1;
+            aw -> ending_len = aw -> word_size - ((q + 1) - aw -> lemma);
 
             // Debug information.
             #ifdef ANALYZER_DEBUG
@@ -179,16 +178,16 @@ bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size, cha
                 *(q + 1) = '\0';
 
                 // Printing lemma.
-                printf("Lemma %s (%d, %d). ", word, lemma_len, lemma_id);
+                printf("Lemma %s (%d, %d). ", aw -> lemma, aw -> lemma_len, aw -> lemma_id);
 
                 // Restore char.
                 *(q + 1) = old_char;
 
                 // Printing ending.
-                printf("(Possible) ending is %s (%d).\n", ending, ending_len);
+                printf("(Possible) ending is %s (%d).\n", aw -> ending, aw -> ending_len);
             #endif
 
-            if(analyzer_search_endings(analyzer, word, lemma_len, lemma_id, ending_len, prefix, buffer))
+            if(analyzer_search_endings(analyzer, aw))
                 result = true;
         }
     }
@@ -205,36 +204,39 @@ bool analyzer_search_lemmas(Analyzer * analyzer, char * word, int word_size, cha
 }
 
 // This function is very similar to analyzer_search_lemmas(). It doesn't search lemmas, it uses special lemma (#). So word is just an ending for this lemma.
-static bool analyzer_special_lemma(Analyzer * analyzer, char * word, int word_size, char prefix, WordInfos * buffer)
+static bool analyzer_special_lemma(Analyzer * analyzer, AnalyzedWord * aw)
 {
     #ifdef ANALYZER_DEBUG
         printf("Use special lemma #. Whole word (%s) is ending.\n", aw -> ending);
     #endif
 
-    // TODO 0 is value of # always?
-
-    // Length of lemma is equal to 0 only for special (#) lemma.
-    int lemma_len = 0, lemma_id = 0;
-    return analyzer_search_endings(analyzer, word, lemma_len, lemma_id, word_size, prefix, buffer);
+    return analyzer_search_endings(analyzer, aw);
 }
 
 //******************************************************************************
 // HELPFULL STATIC FUNCTIONS.
 //******************************************************************************
+
+// This function starts searching lemmas (or use special lemma).
 static bool analyzer_analyze_lemma(Analyzer * analyzer, AnalyzedWord * aw)
 {
     // Search lemmas for word.
-    if(analyzer_search_lemmas(analyzer, aw -> lemma, aw -> word_size - aw -> predict_prefix_len - aw -> prefix_len, aw -> prefix_type, aw -> infos))
+    if(analyzer_search_lemmas(analyzer, aw))
         return true;
 
-    // Search lemmas for # + word.
-    if(analyzer_special_lemma(analyzer, aw -> lemma, aw -> word_size - aw -> predict_prefix_len - aw -> prefix_len, aw -> prefix_type, aw -> infos))
+    // Search endings by special lemma (#, len = 0, id = 0, whole word is
+    // ending).
+    aw -> ending = aw -> lemma;
+    aw -> lemma_len = 0;
+    aw -> lemma_id = 0;
+    if(analyzer_special_lemma(analyzer, aw))
         return true;
 
     return false;
 }
 
-static bool analyzer_analyze_word(Analyzer * analyzer, AnalyzedWord * aw)
+// This functions cut off the prefix (if exists) and start analyzing lemmas.
+static bool analyzer_analyze_prefix(Analyzer * analyzer, AnalyzedWord * aw)
 {
     // Analyze word (without searching prefix).
     aw -> prefix_type = 1;
@@ -287,7 +289,7 @@ bool analyzer_get_word_info(Analyzer * analyzer, char * word, unsigned int word_
     aw -> prefix = word;
 
     // Analyze whole word.
-    if(analyzer_analyze_word(analyzer, aw))
+    if(analyzer_analyze_prefix(analyzer, aw))
     {
         analyzed_word_free(aw);
         return true;
@@ -318,7 +320,7 @@ bool analyzer_get_word_info(Analyzer * analyzer, char * word, unsigned int word_
             aw -> prefix = q + 1;
             aw -> predict_prefix_len = q + 1 - word;
 
-            if(analyzer_analyze_word(analyzer, aw))
+            if(analyzer_analyze_prefix(analyzer, aw))
             {
                 analyzed_word_free(aw);
                 return true;
