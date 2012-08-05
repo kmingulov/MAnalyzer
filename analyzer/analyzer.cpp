@@ -110,13 +110,8 @@ static bool analyzer_search_endings(Analyzer * analyzer, AnalyzedWord * aw)
                 {
                     // Counting length of normal_form word.
                     char * nf_ending = normal_forms_get_ending(analyzer -> n_forms, rules[i + 1]);
-                    int nf_ending_len = strlen(nf_ending); // TODO Is slow?
+                    int nf_ending_len = normal_forms_get_ending_len(analyzer -> n_forms, rules[i + 1]);
                     int nf_len = aw -> predict_prefix_len + aw -> lemma_len + nf_ending_len;
-
-                    bool null_ending = strcmp(nf_ending, "*") == 0;
-
-                    if(null_ending)
-                        nf_len -= nf_ending_len;
 
                     // Creating new char string -- word in normal form.
                     char * nf = (char *) malloc(sizeof(char) * (nf_len + 1));
@@ -124,9 +119,7 @@ static bool analyzer_search_endings(Analyzer * analyzer, AnalyzedWord * aw)
                     // Copying predict_prefix, lemma and new ending.
                     memcpy(nf, aw -> word, aw -> predict_prefix_len * sizeof(char));
                     memcpy(&nf[aw -> predict_prefix_len], aw -> lemma, aw -> lemma_len * sizeof(char));
-
-                    if(!null_ending)
-                        memcpy(&nf[aw -> predict_prefix_len + aw -> lemma_len], nf_ending, nf_ending_len * sizeof(char));
+                    memcpy(&nf[aw -> predict_prefix_len + aw -> lemma_len], nf_ending, nf_ending_len * sizeof(char));
                     nf[nf_len] = '\0';
 
                     infos_prepend_word(aw -> infos,

@@ -13,8 +13,10 @@
 struct NormalForm
 {
     char * ending;
+    unsigned short int ending_len;
     unsigned short int id;
-    char prefix;
+    // TODO Remove completely?
+    //~ char prefix;
 };
 
 struct NormalForms
@@ -45,11 +47,22 @@ NormalForms * normal_forms_fread(const char * filename)
     {
         input >> ending >> id >> prefix;
 
-        nf -> forms[i].ending = (char *) malloc(sizeof(char) * (ending.size() + 1));
-        strcpy(nf -> forms[i].ending, ending.c_str());
+        int ending_size = ending.size();
+
+        if(ending == "*")
+        {
+            nf -> forms[i].ending = NULL;
+            nf -> forms[i].ending_len = 0;
+        }
+        else
+        {
+            nf -> forms[i].ending = (char *) malloc(sizeof(char) * (ending_size + 1));
+            nf -> forms[i].ending_len = ending_size;
+            strcpy(nf -> forms[i].ending, ending.c_str());
+        }
 
         nf -> forms[i].id = id;
-        nf -> forms[i].prefix = prefix;
+        //~ nf -> forms[i].prefix = prefix;
     }
 
     return nf;
@@ -73,6 +86,11 @@ char * normal_forms_get_ending(NormalForms * nf, unsigned int id)
     return nf -> forms[id].ending;
 }
 
+unsigned short int normal_forms_get_ending_len(NormalForms * nf, unsigned int id)
+{
+    return nf -> forms[id].ending_len;
+}
+
 unsigned short int normal_forms_get_type(NormalForms * nf, unsigned int id)
 {
     return nf -> forms[id].id;
@@ -80,5 +98,6 @@ unsigned short int normal_forms_get_type(NormalForms * nf, unsigned int id)
 
 char normal_forms_get_prefix(NormalForms * nf, unsigned int id)
 {
-    return nf -> forms[id].prefix;
+    return 1;
+    //~ return nf -> forms[id].prefix;
 }

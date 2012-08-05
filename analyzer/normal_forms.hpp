@@ -3,7 +3,7 @@
 
 /*
     This struct contains information about normal forms (each of them contains
-    ending, id and required prefix).
+    ending, ending length and id).
 */
 struct NormalForms;
 
@@ -21,6 +21,7 @@ void normal_forms_free(NormalForms * nf);
     Gets data of normal form.
 */
 char * normal_forms_get_ending(NormalForms * nf, unsigned int id);
+unsigned short int normal_forms_get_ending_len(NormalForms * nf, unsigned int id);
 unsigned short int normal_forms_get_type(NormalForms * nf, unsigned int id);
 char normal_forms_get_prefix(NormalForms * nf, unsigned int id);
 
