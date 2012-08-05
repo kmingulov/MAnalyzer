@@ -87,24 +87,6 @@ void analyzer_free(Analyzer * analyzer)
 // Searches endings for word from lemma's rules.
 static bool analyzer_search_endings(Analyzer * analyzer, AnalyzedWord * aw)
 {
-    char buffer[1024];
-
-    memcpy(&buffer[0], aw -> word, aw -> predict_prefix_len * sizeof(char));
-    buffer[aw -> predict_prefix_len] = '\0';
-    printf("%s=%s+", aw -> word, &buffer[0]);
-
-    memcpy(&buffer[0], aw -> prefix, aw -> prefix_len * sizeof(char));
-    buffer[aw -> prefix_len] = '\0';
-    printf("%s(%d)+", &buffer[0], aw -> prefix_type);
-
-    memcpy(&buffer[0], aw -> lemma, aw -> lemma_len * sizeof(char));
-    buffer[aw -> lemma_len] = '\0';
-    printf("%s+", &buffer[0]);
-
-    memcpy(&buffer[0], aw -> ending, aw -> ending_len * sizeof(char));
-    buffer[aw -> ending_len] = '\0';
-    printf("%s", &buffer[0]);
-
     bool result = false;
 
     short int * rules = lemmas_rules_get(analyzer -> l_rules, aw -> lemma_id);
@@ -126,19 +108,18 @@ static bool analyzer_search_endings(Analyzer * analyzer, AnalyzedWord * aw)
             for(int j = 0; j < count; j++)
                 if(aw -> prefix_type == forms[j].prefix)
                 {
-                    // TODO I need to add predict_prefix.
-
                     // Counting length of normal_form word.
                     char * nf_ending = normal_forms_get_ending(analyzer -> n_forms, rules[i + 1]);
                     int nf_ending_len = strlen(nf_ending); // TODO Is slow?
-                    int nf_len = aw -> lemma_len + nf_ending_len;
+                    int nf_len = aw -> predict_prefix_len + aw -> lemma_len + nf_ending_len;
 
                     // Creating new char string -- word in normal form.
                     char * nf = (char *) malloc(sizeof(char) * (nf_len + 1));
 
-                    // Copying lemma.
-                    memcpy(nf, aw -> lemma, aw -> lemma_len * sizeof(char));
-                    memcpy(&nf[aw -> lemma_len], nf_ending, nf_ending_len * sizeof(char));
+                    // Copying predict_prefix, lemma and new ending.
+                    memcpy(nf, aw -> word, aw -> predict_prefix_len * sizeof(char));
+                    memcpy(&nf[aw -> predict_prefix_len], aw -> lemma, aw -> lemma_len * sizeof(char));
+                    memcpy(&nf[aw -> predict_prefix_len + aw -> lemma_len], nf_ending, nf_ending_len * sizeof(char));
                     nf[nf_len] = '\0';
 
                     infos_prepend_word(aw -> infos,
