@@ -87,6 +87,24 @@ void analyzer_free(Analyzer * analyzer)
 // Searches endings for word from lemma's rules.
 static bool analyzer_search_endings(Analyzer * analyzer, AnalyzedWord * aw)
 {
+    char buffer[1024];
+
+    memcpy(&buffer[0], aw -> word, aw -> predict_prefix_len * sizeof(char));
+    buffer[aw -> predict_prefix_len] = '\0';
+    printf("%s=%s+", aw -> word, &buffer[0]);
+
+    memcpy(&buffer[0], aw -> prefix, aw -> prefix_len * sizeof(char));
+    buffer[aw -> prefix_len] = '\0';
+    printf("%s(%d)+", &buffer[0], aw -> prefix_type);
+
+    memcpy(&buffer[0], aw -> lemma, aw -> lemma_len * sizeof(char));
+    buffer[aw -> lemma_len] = '\0';
+    printf("%s+", &buffer[0]);
+
+    memcpy(&buffer[0], aw -> ending, aw -> ending_len * sizeof(char));
+    buffer[aw -> ending_len] = '\0';
+    printf("%s", &buffer[0]);
+
     bool result = false;
 
     short int * rules = lemmas_rules_get(analyzer -> l_rules, aw -> lemma_id);
@@ -183,7 +201,7 @@ bool analyzer_search_lemmas(Analyzer * analyzer, AnalyzedWord * aw)
             aw -> lemma_id = analyzer -> lemmas.value(index);
             aw -> lemma_len = q + 1 - aw -> lemma;
             aw -> ending = q + 1;
-            aw -> ending_len = aw -> word_size - ((q + 1) - aw -> lemma);
+            aw -> ending_len = aw -> word_size - ((q + 1) - aw -> word);
 
             // Debug information.
             #ifdef ANALYZER_DEBUG
