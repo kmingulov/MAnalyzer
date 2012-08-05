@@ -5,7 +5,7 @@ RECODE = recode
 C = gcc
 C++ = g++
 
-all: lemmas_and_prefixes lemmas_rules rules_split_and_sort rules_dics normal_forms
+all: make_dawgdics make_rules rules_split_and_sort rules_dics normal_forms
 	mkdir -p ../dics
 	mkdir -p temp
 
@@ -20,18 +20,21 @@ all: lemmas_and_prefixes lemmas_rules rules_split_and_sort rules_dics normal_for
 	$(SQLITE) sqlite/rules.sqlite "SELECT value FROM shelf;" | sed s/\"\"/*/g | sed s/[\]\[\",]//g > temp/raw_rules
 	# Endings (for prediction).
 	$(SQLITE) sqlite/endings.sqlite "SELECT key FROM shelf ORDER BY key;" > temp/endings
-	$(SQLITE) sqlite/endings.sqlite "SELECT value FROM shelf ORDER BY key;" | sed s/"[][]"/_/g | sed s/"[\",\ ]"//g | sed s/"_[0-9]*_"//g | sed s/[{}]//g | sed s/":"/" "/g > temp/endings_rules # Seems like I know regexps horribly. TODO Make it better?
+	$(SQLITE) sqlite/endings.sqlite "SELECT value FROM shelf ORDER BY key;" | sed s/"[][]"/_/g | sed s/"[\",\ ]"//g | sed s/"_[0-9]*_"//g | sed s/":}"//g | sed s/{//g | sed s/:/" "/g > temp/endings_rules # Seems like I know regexps horribly. TODO Make it better?
 
 	# Prepare lemmas lexicon.
 	$(RECODE) utf8..cp1251 temp/lemmas
 	# Prepare predict prefixes lexicon.
 	sort temp/predict_prefixes > temp/predict_prefixes_sorted
 	$(RECODE) utf8..cp1251 temp/predict_prefixes_sorted
+	# Prepare endings lexicon.
+	$(RECODE) utf8..cp1251 temp/endings
 	# Creating dawgdics.
-	./lemmas_and_prefixes
+	./make_dawgdics
 
-	# Making lemmas_rules
-	./lemmas_rules
+	# Making lemmas_rules and endings_rules
+	./make_rules temp/lemmas_rules ../dics/lemmas_rules
+	./make_rules temp/endings_rules ../dics/endings_rules
 	# Add count of rules to the first line.
 	sed -i "1i`wc -l ../dics/lemmas_rules | cut -f1 --delimiter=' '`" ../dics/lemmas_rules
 
@@ -74,11 +77,11 @@ all: lemmas_and_prefixes lemmas_rules rules_split_and_sort rules_dics normal_for
 	# Remove temp.
 	#~ rm -r temp/
 
-lemmas_and_prefixes: lemmas_and_prefixes.cpp
-	$(C++) -g -o lemmas_and_prefixes lemmas_and_prefixes.cpp
+make_dawgdics: make_dawgdics.cpp
+	$(C++) -g -o make_dawgdics make_dawgdics.cpp
 
-lemmas_rules: lemmas_rules.c
-	$(C) -g -std=c99 -o lemmas_rules lemmas_rules.c
+make_rules: make_rules.c
+	$(C) -g -std=c99 -o make_rules make_rules.c
 
 rules_split_and_sort: rules_split_and_sort.cpp
 	$(C++) -g -o rules_split_and_sort rules_split_and_sort.cpp

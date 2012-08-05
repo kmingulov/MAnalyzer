@@ -12,8 +12,8 @@ result*
 # Executable files.
 ma
 cache
-create_dics/lemmas_rules
-create_dics/lemmas_and_prefixes
+create_dics/make_rules
+create_dics/make_dawgdics
 create_dics/rules_split_and_sort
 create_dics/rules_dics
 create_dics/normal_forms

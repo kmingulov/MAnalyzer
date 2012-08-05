@@ -33,6 +33,7 @@ int main()
 {
     create_dic("temp/predict_prefixes_sorted", "../dics/predict_prefixes.dawgdic");
     create_dic("temp/lemmas", "../dics/lemmas.dawgdic");
+    create_dic("temp/endings", "../dics/endings.dawgdic");
 
     return 0;
 }

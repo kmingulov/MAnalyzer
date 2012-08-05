@@ -1,10 +1,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int main()
+int main(int argc, char ** argv)
 {
-    FILE * input = fopen("temp/lemmas_rules", "r");
-    FILE * output = fopen("../dics/lemmas_rules", "w");
+    if(argc < 3)
+    {
+        fprintf(stderr, "Error: too few args.\n");
+        return 1;
+    }
+
+    FILE * input = fopen(argv[1], "r");
+    FILE * output = fopen(argv[2], "w");
+
+    if(input == NULL || output == NULL)
+    {
+        fprintf(stderr, "Error: cannot open file.\n");
+        return 1;
+    }
 
     int buffer[1024];
     int current = 0;
