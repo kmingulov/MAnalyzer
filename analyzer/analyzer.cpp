@@ -94,10 +94,6 @@ static bool analyzer_search_endings(Analyzer * analyzer, AnalyzedWord * aw)
     // Going through all rules for this lemma and check the ending.
     for(int i = 0; i < rules[0]; i++)
     {
-        #ifdef ANALYZER_DEBUG
-            printf("\tRule %d\n", rules[i + 1]);
-        #endif
-
         // Searching ending in rule's dawgdic.
         int value;
         if
@@ -135,7 +131,7 @@ static bool analyzer_search_endings(Analyzer * analyzer, AnalyzedWord * aw)
                     result = true;
 
                     #ifdef ANALYZER_DEBUG
-                        printf("\t\tForm %d (normal = %s)\n", forms[j].id, nf);
+                        printf("\t\tRule %d\n\t\t\tForm %d (normal = %s)\n", rules[i + 1], forms[j].id, nf);
                     #endif
 
                     #ifdef QUIET_ANALYZER_DEBUG
@@ -196,7 +192,7 @@ bool analyzer_search_lemmas(Analyzer * analyzer, AnalyzedWord * aw)
                 *(q + 1) = '\0';
 
                 // Printing lemma.
-                printf("Lemma %s (%d, %d). ", aw -> lemma, aw -> lemma_len, aw -> lemma_id);
+                printf("\tLemma %s (%d, %d). ", aw -> lemma, aw -> lemma_len, aw -> lemma_id);
 
                 // Restore char.
                 *(q + 1) = old_char;
@@ -210,10 +206,6 @@ bool analyzer_search_lemmas(Analyzer * analyzer, AnalyzedWord * aw)
         }
     }
 
-    #ifdef ANALYZER_DEBUG
-        printf("\n");
-    #endif
-
     return result;
 }
 
@@ -222,7 +214,7 @@ bool analyzer_search_lemmas(Analyzer * analyzer, AnalyzedWord * aw)
 static bool analyzer_special_lemma(Analyzer * analyzer, AnalyzedWord * aw)
 {
     #ifdef ANALYZER_DEBUG
-        printf("Use special lemma #. Whole word (%s) is ending.\n", aw -> ending);
+        printf("\tLemma # (1, 0). (Possible) ending is %s (%d).\n", aw -> ending, aw -> ending_len);
     #endif
 
     return analyzer_search_endings(analyzer, aw);
@@ -279,6 +271,10 @@ static bool analyzer_analyze_prefix(Analyzer * analyzer, AnalyzedWord * aw)
         aw -> lemma = aw -> prefix + 2;
         aw -> lemma_len = 0;
 
+        #ifdef ANALYZER_DEBUG
+            printf("\tPrefix is ÏÎ (2).\n");
+        #endif
+
         if(analyzer_analyze_lemma(analyzer, aw))
             return true;
     }
@@ -294,6 +290,10 @@ static bool analyzer_analyze_prefix(Analyzer * analyzer, AnalyzedWord * aw)
         aw -> prefix_len = 3;
         aw -> lemma = aw -> prefix + 3;
         aw -> lemma_len = 0;
+
+        #ifdef ANALYZER_DEBUG
+            printf("\tPrefix is ÍÀÈ (3).\n");
+        #endif
 
         if(analyzer_analyze_lemma(analyzer, aw))
             return true;
@@ -321,7 +321,7 @@ bool analyzer_get_word_info(Analyzer * analyzer, char * word, unsigned int word_
 
     // Analyze word without predict prefix.
     dawgdic::BaseType index = analyzer -> predict_prefixes.root();
-    for(char *q = word; *q != '\0'; q++)
+    for(char *q = aw -> word; *q != '\0'; q++)
     {
         if(!analyzer -> predict_prefixes.Follow(*q, &index))
             break;
@@ -329,20 +329,20 @@ bool analyzer_get_word_info(Analyzer * analyzer, char * word, unsigned int word_
         // Found predict prefix.
         if(analyzer -> predict_prefixes.has_value(index))
         {
+            aw -> prefix = q + 1;
+            aw -> predict_prefix_len = q + 1 - word;
+
             // Debug information.
             #ifdef ANALYZER_DEBUG
                 // Cutting off the begining.
                 char old_char = *(q + 1);
                 *(q + 1) = '\0';
 
-                printf("Predict prefix is %s (%d)\n", word, q + 1 - word);
+                printf("\tPredict prefix is %s (%d)\n", aw -> word, q + 1 - aw -> word);
 
                 // Restoring the char.
                 *(q + 1) = old_char;
             #endif
-
-            aw -> prefix = q + 1;
-            aw -> predict_prefix_len = q + 1 - word;
 
             if(analyzer_analyze_prefix(analyzer, aw))
             {
