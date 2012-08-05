@@ -1,10 +1,7 @@
 Features:
     * add prediction
+    * words with dash in the middle?
 
 Code:
     * The main code of the analyzer is horrible. I need to think about it and
       improve it or rewrite.
-
-Algo:
-    * some problems with getting info about some words (РОЗОВЫЙ, АВГУСТ,
-      РАССКАЗ, ...)

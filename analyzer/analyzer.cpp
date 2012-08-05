@@ -113,13 +113,20 @@ static bool analyzer_search_endings(Analyzer * analyzer, AnalyzedWord * aw)
                     int nf_ending_len = strlen(nf_ending); // TODO Is slow?
                     int nf_len = aw -> predict_prefix_len + aw -> lemma_len + nf_ending_len;
 
+                    bool null_ending = strcmp(nf_ending, "*") == 0;
+
+                    if(null_ending)
+                        nf_len -= nf_ending_len;
+
                     // Creating new char string -- word in normal form.
                     char * nf = (char *) malloc(sizeof(char) * (nf_len + 1));
 
                     // Copying predict_prefix, lemma and new ending.
                     memcpy(nf, aw -> word, aw -> predict_prefix_len * sizeof(char));
                     memcpy(&nf[aw -> predict_prefix_len], aw -> lemma, aw -> lemma_len * sizeof(char));
-                    memcpy(&nf[aw -> predict_prefix_len + aw -> lemma_len], nf_ending, nf_ending_len * sizeof(char));
+
+                    if(!null_ending)
+                        memcpy(&nf[aw -> predict_prefix_len + aw -> lemma_len], nf_ending, nf_ending_len * sizeof(char));
                     nf[nf_len] = '\0';
 
                     infos_prepend_word(aw -> infos,
@@ -142,11 +149,11 @@ static bool analyzer_search_endings(Analyzer * analyzer, AnalyzedWord * aw)
 
                         memcpy(&buffer[0], aw -> prefix, aw -> prefix_len * sizeof(char));
                         buffer[aw -> prefix_len] = '\0';
-                        printf("%s+", &buffer[0]);
+                        printf("%s(%d)+", &buffer[0], aw -> prefix_type);
 
                         memcpy(&buffer[0], aw -> lemma, aw -> lemma_len * sizeof(char));
                         buffer[aw -> lemma_len] = '\0';
-                        printf("%s+", &buffer[0]);
+                        printf("%s(%d)+", &buffer[0], aw -> lemma_id);
 
                         memcpy(&buffer[0], aw -> ending, aw -> ending_len * sizeof(char));
                         buffer[aw -> ending_len] = '\0';
