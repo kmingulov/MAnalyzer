@@ -27,7 +27,7 @@ all: make_dawgdics make_rules rules_split_and_sort rules_dics normal_forms
 	# Prepare predict prefixes lexicon.
 	sort temp/predict_prefixes > temp/predict_prefixes_sorted
 	$(RECODE) utf8..cp1251 temp/predict_prefixes_sorted
-	# Prepare endings lexicon.
+	# Prepare endings lexicon. (See make_dawgdics.cpp for some notes.)
 	$(RECODE) utf8..cp1251 temp/endings
 	# Creating dawgdics.
 	./make_dawgdics
