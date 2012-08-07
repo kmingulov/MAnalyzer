@@ -18,7 +18,7 @@
 // DEBUG DEFINES.
 //******************************************************************************
 #ifdef MANALYZER_DEBUG
-    #define MA_DEBUG(...) { fprintf(stderr, "[%d] ", time(NULL)); fprintf(stderr, __VA_ARGS__); }
+    #define MA_DEBUG(...) { fprintf(stderr, "[%d]", time(NULL)); fprintf(stderr, __VA_ARGS__); }
     #define MA_DEBUG_(...) { fprintf(stderr, __VA_ARGS__); }
 #else
     #define MA_DEBUG(...) {}
@@ -438,17 +438,22 @@ bool analyzer_predict(Analyzer * analyzer, AnalyzedWord * aw)
                     {
                         result = true;
 
-                        // Make normal form.
-                        char * n_ending = normal_forms_get_ending(analyzer -> n_forms, rules[i + 1]);
-                        int n_ending_len = normal_forms_get_ending_len(analyzer -> n_forms, rules[i + 1]);
-                        int nf_len = n_ending_len + (q - aw -> word);
+                        // Counting length of normal_form word.
+                        char * nf_ending = normal_forms_get_ending(analyzer -> n_forms, rules[i + 1]);
+                        int nf_ending_len = normal_forms_get_ending_len(analyzer -> n_forms, rules[i + 1]);
+                        int w_len = (q - aw -> word);
+                        int nf_len = w_len + nf_ending_len;
+
+                        // Creating new char string -- word in normal form.
                         char * nf = (char *) malloc(sizeof(char) * (nf_len + 1));
 
-                        memcpy(nf, aw -> word, sizeof(char) * (q - aw -> word));
-                        if(n_ending != NULL)
-                            strcpy(&nf[q - aw -> word], n_ending);
+                        // Copying the rest part of the original word and normal
+                        // form ending.
+                        memcpy(nf, aw -> word, w_len * sizeof(char));
+                        memcpy(&nf[w_len], nf_ending, nf_ending_len * sizeof(char));
+                        nf[nf_len] = '\0';
 
-                        infos_prepend_word(aw -> infos, 
+                        infos_prepend_word(aw -> infos,
                             nf,
                             normal_forms_get_type(analyzer -> n_forms, rules[i + 1]),
                             forms[j].id);

@@ -1,7 +1,10 @@
 Features:
-    * add prediction
-    * words with dash in the middle?
+    * Improve prediction.
+
+Algo:
+    * Prefixes (ПО and НАИ) are hardcoded now. Fix?
 
 Code:
     * The main code of the analyzer is horrible. I need to think about it and
       improve it or rewrite.
+    * Check all TODOs
