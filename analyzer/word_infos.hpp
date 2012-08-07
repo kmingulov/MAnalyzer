@@ -21,7 +21,7 @@ void infos_erase(WordInfos * wi);
 /*
     Prepends word to infos array.
 */
-bool infos_prepend_word(WordInfos * wi, char * form, unsigned short int n_form_id, unsigned short int form_id);
+bool infos_prepend_word(WordInfos * wi, char * form, unsigned short int n_form_id, unsigned short int form_id, bool prediction = false);
 
 /*
     Check: the array with results is prediction or not.

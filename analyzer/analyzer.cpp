@@ -453,7 +453,8 @@ bool analyzer_predict(Analyzer * analyzer, AnalyzedWord * aw)
                         infos_prepend_word(aw -> infos,
                             nf,
                             normal_forms_get_type(analyzer -> n_forms, rules[i + 1]),
-                            forms[j].id);
+                            forms[j].id,
+                            true);
 
                         MA_DEBUG("[PREDICTION] \t\t\tPrediction succeed. Type = %d, normal form = '%s' (%d).\n", forms[j].id, nf, normal_forms_get_type(analyzer -> n_forms, rules[i + 1]));
                     }

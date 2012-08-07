@@ -15,8 +15,6 @@ struct NormalForm
     char * ending;
     unsigned short int ending_len;
     unsigned short int id;
-    // TODO Remove completely?
-    //~ char prefix;
 };
 
 struct NormalForms
@@ -62,7 +60,6 @@ NormalForms * normal_forms_fread(const char * filename)
         }
 
         nf -> forms[i].id = id;
-        //~ nf -> forms[i].prefix = prefix;
     }
 
     return nf;
@@ -99,5 +96,4 @@ unsigned short int normal_forms_get_type(NormalForms * nf, unsigned int id)
 char normal_forms_get_prefix(NormalForms * nf, unsigned int id)
 {
     return 1;
-    //~ return nf -> forms[id].prefix;
 }
