@@ -40,3 +40,27 @@ void analyzed_word_free(AnalyzedWord * aw)
 {
     free(aw);
 }
+
+void analyzed_word_prefix_clean_up(AnalyzedWord * aw)
+{
+    analyzed_word_lemma_clean_up(aw);
+
+    aw -> prefix = NULL;
+    aw -> prefix_len = 0;
+    aw -> prefix_type = 0;
+}
+
+void analyzed_word_lemma_clean_up(AnalyzedWord * aw)
+{
+    analyzed_word_ending_clean_up(aw);
+
+    aw -> lemma = NULL;
+    aw -> lemma_len = 0;
+    aw -> lemma_id = 0;
+}
+
+void analyzed_word_ending_clean_up(AnalyzedWord * aw)
+{
+    aw -> ending = NULL;
+    aw -> ending_len = 0;
+}

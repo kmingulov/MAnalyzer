@@ -39,4 +39,15 @@ AnalyzedWord * analyzed_word_new(char * word, unsigned int word_size, WordInfos 
 */
 void analyzed_word_free(AnalyzedWord * aw);
 
+/*
+    Clean up functions. They delete specified data from word.
+    Note: prefix_clean_up() will call lemma_clean_up(), lemma_clean_up() will 
+    call ending_clean_up(). I.e. when you delete data about prefix,
+    lemma and endings data become useless -- because they are based on prefix
+    data.
+*/
+void analyzed_word_prefix_clean_up(AnalyzedWord * aw);
+void analyzed_word_lemma_clean_up(AnalyzedWord * aw);
+void analyzed_word_ending_clean_up(AnalyzedWord * aw);
+
 #endif

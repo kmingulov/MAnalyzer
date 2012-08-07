@@ -253,9 +253,8 @@ static bool analyzer_special_lemma(Analyzer * analyzer, AnalyzedWord * aw)
 // This function starts searching lemmas (or use special lemma).
 static bool analyzer_analyze_lemma(Analyzer * analyzer, AnalyzedWord * aw)
 {
-    // Preparing.
-    aw -> ending = NULL;
-    aw -> ending_len = 0;
+    // Clean up.
+    analyzed_word_ending_clean_up(aw);
 
     // Search lemmas for word.
     if(analyzer_search_lemmas(analyzer, aw))
