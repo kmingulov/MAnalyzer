@@ -7,6 +7,7 @@
 #include "forms.hpp"
 #include "rules.hpp"
 #include "lemmas_rules.hpp"
+#include "endings_rules.hpp"
 #include "normal_forms.hpp"
 #include "analyzed_word.hpp"
 
@@ -18,12 +19,15 @@
 
 struct Analyzer
 {
-    // Prefixes' and lemmas' dictionaries.
+    // Prefixes', lemmas' and endings' dictionaries.
     dawgdic::Dictionary predict_prefixes;
     dawgdic::Dictionary lemmas;
+    dawgdic::Dictionary endings;
 
-    // Rules for lemmas (array with id of rules for each lemma).
+    // Rules for lemmas and endings (array with id of rules for each lemma/
+    // ending).
     LemmasRules * l_rules;
+    EndingsRules * e_rules;
 
     // Array with normal forms.
     NormalForms * n_forms;
@@ -52,12 +56,17 @@ Analyzer * analyzer_new()
     std::ifstream predict_prefixes_file("dics/predict_prefixes.dawgdic", std::ios::binary);
     result -> predict_prefixes.Read(&predict_prefixes_file);
 
-    // ... and lemmas.
+    // ...lemmas...
     std::ifstream lemmas_file("dics/lemmas.dawgdic", std::ios::binary);
     result -> lemmas.Read(&lemmas_file);
 
-    // Reading lemmas rules (connects each lemma's id to it's rules).
+    // ...and endings.
+    std::ifstream endings_file("dics/endings.dawgdic", std::ios::binary);
+    result -> endings.Read(&endings_file);
+
+    // Reading lemmas and endings rules.
     result -> l_rules = lemmas_rules_fread("dics/lemmas_rules");
+    result -> e_rules = endings_rules_fread("dics/endings_rules");
 
     // Reading all forms from file.
     result -> forms = forms_fread("dics/rules/forms");
@@ -74,6 +83,7 @@ Analyzer * analyzer_new()
 void analyzer_free(Analyzer * analyzer)
 {
     lemmas_rules_free(analyzer -> l_rules);
+    endings_rules_free(analyzer -> e_rules);
     forms_free(analyzer -> forms);
     rules_free(analyzer -> rules);
     normal_forms_free(analyzer -> n_forms);
@@ -366,13 +376,76 @@ bool analyzer_get_word_info(Analyzer * analyzer, char * word, unsigned int word_
 
 bool analyzer_predict(Analyzer * analyzer, AnalyzedWord * aw)
 {
+    bool result = false;
+
+    #ifdef ANALYZER_DEBUG
+        fprintf(stderr, "[PREDICTION] Start prediction for '%s'\n", aw -> word);
+    #endif
+
     // TODO Check for #+ending?
 
     // Check the possible endings of the word (with length up to 5 letters).
+    // Note: we store endings reversed (i.e. ending abcde stored as edcba). By
+    // this trick we can use prefix search (we can call it "reversed ending
+    // search").
     char * end = aw -> word + aw -> word_size;
+    dawgdic::BaseType index = analyzer -> endings.root();
     for(char * q = end - 1; end - q <= 5 && q >= aw -> word; q--)
     {
-        // q is the ending now.
-        
+        if(!analyzer -> endings.Follow(*q, &index))
+            break;
+
+        // Found ending.
+        if(analyzer -> endings.has_value(index))
+        {
+            int ending_id = analyzer -> endings.value(index);
+            unsigned short int * rules = endings_rules_get(analyzer -> e_rules, ending_id);
+
+            #ifdef ANALYZER_DEBUG
+                fprintf(stderr, "[PREDICTION] \tFound ending '%s' (%d, %d)\n", q, end - q, ending_id);
+            #endif
+
+            // Go through each rule.
+            for(int i = 0; i < rules[0]; i++)
+            {
+                // Searching ending in rule's dawgdic.
+                int value;
+                if(rules_find_ending_in_rule(analyzer -> rules, rules[i + 1], q, end - q, &value))
+                {
+                    #ifdef ANALYZER_DEBUG
+                        fprintf(stderr, "[PREDICTION] \t\tFound ending in rule %d\n", rules[i + 1]);
+                    #endif
+
+                    int count = forms_get_length(analyzer -> forms, value);
+                    FormInfo * forms = forms_get_form_infos(analyzer -> forms, value);
+
+                    for(int j = 0; j < count; j++)
+                    {
+                        result = true;
+
+                        // Make normal form.
+                        char * n_ending = normal_forms_get_ending(analyzer -> n_forms, rules[i + 1]);
+                        int n_ending_len = normal_forms_get_ending_len(analyzer -> n_forms, rules[i + 1]);
+                        int nf_len = n_ending_len + (q - aw -> word);
+                        char * nf = (char *) malloc(sizeof(char) * (nf_len + 1));
+
+                        memcpy(nf, aw -> word, sizeof(char) * (q - aw -> word));
+                        if(n_ending != NULL)
+                            strcpy(&nf[q - aw -> word], n_ending);
+
+                        infos_prepend_word(aw -> infos, 
+                            nf,
+                            normal_forms_get_type(analyzer -> n_forms, rules[i + 1]),
+                            forms[j].id);
+
+                        #ifdef ANALYZER_DEBUG
+                            fprintf(stderr, "[PREDICTION] \t\t\tPrediction succeed. Type = %d, normal form = '%s' (%d).\n", forms[j].id, nf, normal_forms_get_type(analyzer -> n_forms, rules[i + 1]));
+                        #endif
+                    }
+                }
+            }
+        }
     }
+
+    return result;
 }

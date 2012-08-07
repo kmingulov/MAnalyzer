@@ -35,12 +35,12 @@ void analyze_file(Analyzer * analyzer, const char * filename)
         }
         else
         {
-            printf("%s\n", text[i]);
+            //~ printf("%s\n", text[i]);
             //~ printf("%d\n", 0);
         }
         infos_erase(wi);
     }
-
+//~ 
     infos_free(wi);
 }
 
@@ -48,7 +48,7 @@ int main()
 {
     Analyzer * analyzer = analyzer_new();
 
-    //~ analyze_file(analyzer, "input2");
+    //~ analyze_file(analyzer, "input");
 
     char buffer[1024];
     WordInfos * wi = infos_new(1024);
@@ -58,19 +58,15 @@ int main()
         int len = strlen(&buffer[0]) - 1;
         buffer[len] = '\0';
 
-        if(!analyzer_get_word_info(analyzer, &buffer[0], len, wi))
-            std::cout << "\tÑëîâî íå íàéäåíî.\n";
-        else
-        {
-            for(int i = 0; i < infos_get_size(wi); i++)
-                std::cout << "\t" << infos_get_normal_form(wi, i) << 
-                    "\t" << infos_get_normal_form_id(wi, i) << 
-                    "\t" << infos_get_form_id(wi, i) << "\n";
-            infos_erase(wi);
-        }
+        analyzer_get_word_info(analyzer, &buffer[0], len, wi);
     }
 
     infos_free(wi);
+
+    //~ char word[] = {"ÁÎÌÁÎÌÁÎÌ"};
+    //~ WordInfos * wi = infos_new(1024);
+//~ 
+    //~ analyzer_get_word_info(analyzer, word, strlen(word), wi);
 
     analyzer_free(analyzer);
 

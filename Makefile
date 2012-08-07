@@ -8,11 +8,11 @@ endif
 
 KEYS = -O3
 
-ma: main.o analyzer.o analyzed_word.o lemmas_rules.o forms.o rules.o word_infos.o normal_forms.o
-	g++ -g $(KEYS) -o ma main.o analyzer.o analyzed_word.o lemmas_rules.o forms.o rules.o word_infos.o normal_forms.o
+ma: main.o analyzer.o analyzed_word.o lemmas_rules.o forms.o rules.o word_infos.o normal_forms.o endings_rules.o
+	g++ -g $(KEYS) -o ma main.o analyzer.o analyzed_word.o lemmas_rules.o forms.o rules.o word_infos.o normal_forms.o endings_rules.o
 
-cache: with_cache.o analyzer.o analyzed_word.o lemmas_rules.o forms.o rules.o word_infos.o normal_forms.o
-	g++ -g $(KEYS) -o cache with_cache.o analyzer.o analyzed_word.o lemmas_rules.o forms.o rules.o word_infos.o normal_forms.o
+cache: with_cache.o analyzer.o analyzed_word.o lemmas_rules.o forms.o rules.o word_infos.o normal_forms.o endings_rules.o
+	g++ -g $(KEYS) -o cache with_cache.o analyzer.o analyzed_word.o lemmas_rules.o forms.o rules.o word_infos.o normal_forms.o endings_rules.o
 
 main.o: main.cpp
 	g++ $(KEYS) $(DEBUG_MODE) -g -c main.cpp
@@ -28,6 +28,9 @@ analyzed_word.o: analyzer/analyzed_word.cpp
 
 lemmas_rules.o: analyzer/lemmas_rules.cpp
 	g++ $(KEYS) $(DEBUG_MODE) -g -c analyzer/lemmas_rules.cpp
+
+endings_rules.o: analyzer/endings_rules.cpp
+	g++ $(KEYS) $(DEBUG_MODE) -g -c analyzer/endings_rules.cpp
 
 rules.o: analyzer/rules.cpp
 	g++ $(KEYS) $(DEBUG_MODE) -g -c analyzer/rules.cpp
