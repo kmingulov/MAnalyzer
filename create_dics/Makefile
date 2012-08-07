@@ -19,8 +19,7 @@ all: make_dawgdics make_rules rules_split_and_sort rules_dics normal_forms
 	# Raw rules.
 	$(SQLITE) sqlite/rules.sqlite "SELECT value FROM shelf;" | sed s/\"\"/*/g | sed s/[\]\[\",]//g > temp/raw_rules
 	# Endings (for prediction).
-	$(SQLITE) sqlite/endings.sqlite "SELECT key FROM shelf ORDER BY key;" > temp/endings
-	$(SQLITE) sqlite/endings.sqlite "SELECT value FROM shelf ORDER BY key;" | sed s/"[][]"/_/g | sed s/"[\",\ ]"//g | sed s/"_[0-9]*_"//g | sed s/":}"//g | sed s/{//g | sed s/:/" "/g > temp/endings_rules # Seems like I know regexps horribly. TODO Make it better?
+	$(SQLITE) sqlite/endings.sqlite "SELECT * FROM shelf ORDER BY key;" | sed s/"{}"/-1/g | sed s/"[][]"/_/g | sed s/"[\",\ ]"//g | sed s/"_[0-9]*_"//g | sed s/":}"//g | sed s/{//g | sed s/[:\|]/" "/g > temp/endings # Seems like I know regexps horribly. TODO Make it better?
 
 	# Prepare lemmas lexicon.
 	$(RECODE) utf8..cp1251 temp/lemmas
@@ -28,7 +27,20 @@ all: make_dawgdics make_rules rules_split_and_sort rules_dics normal_forms
 	sort temp/predict_prefixes > temp/predict_prefixes_sorted
 	$(RECODE) utf8..cp1251 temp/predict_prefixes_sorted
 	# Prepare endings lexicon. (See make_dawgdics.cpp for some notes.)
-	$(RECODE) utf8..cp1251 temp/endings
+	# Too slow.
+	cat temp/endings | while read line; do \
+		end=`echo "$$line" | cut -d' ' -f1 | rev`; \
+		rules=`echo "$$line" | cut -d' ' -f2-`; \
+		echo "$$end $$rules" >> temp/endings_reversed; \
+	done;
+	sort -k1 -t' ' temp/endings_reversed > temp/endings_sorted;
+	cat temp/endings_sorted | while read line; do \
+		end=`echo "$$line" | cut -d' ' -f1`; \
+		rules=`echo "$$line" | cut -d' ' -f2-`; \
+		echo "$$end" >> temp/ends; \
+		echo "$$rules" >> temp/endings_rules; \
+	done;
+	$(RECODE) utf8..cp1251 temp/ends;
 	# Creating dawgdics.
 	./make_dawgdics
 
@@ -37,6 +49,7 @@ all: make_dawgdics make_rules rules_split_and_sort rules_dics normal_forms
 	./make_rules temp/endings_rules ../dics/endings_rules
 	# Add count of rules to the first line.
 	sed -i "1i`wc -l ../dics/lemmas_rules | cut -f1 --delimiter=' '`" ../dics/lemmas_rules
+	sed -i "1i`wc -l ../dics/endings_rules | cut -f1 --delimiter=' '`" ../dics/endings_rules
 
 	# Making gramtab.
 	$(SQLITE) sqlite/misc.sqlite "SELECT value FROM shelf WHERE key='gramtab'" | \
