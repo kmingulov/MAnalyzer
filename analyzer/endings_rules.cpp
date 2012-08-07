@@ -41,7 +41,7 @@ EndingsRules * endings_rules_fread(const char * filename)
         rules -> rules[i][0] = (unsigned short int) count;
 
         for(int j = 0; j < count; j++)
-            fscanf(file, "%hd", &(rules -> rules[i][j + 1]));
+            fscanf(file, "%d", &(rules -> rules[i][j + 1]));
     }
 
     fclose(file);

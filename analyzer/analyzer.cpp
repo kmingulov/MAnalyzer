@@ -1,6 +1,8 @@
 #include <fstream>
 #include <sstream>
 
+#include <dawgdic/dictionary.h>
+
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
@@ -429,6 +431,7 @@ bool analyzer_predict(Analyzer * analyzer, AnalyzedWord * aw)
             {
                 // Searching ending in rule's dawgdic.
                 int value;
+                std::cout << rules[i + 1] << "\n";
                 if(rules_find_ending_in_rule(analyzer -> rules, rules[i + 1], q, end - q, &value))
                 {
                     MA_DEBUG("[PREDICTION] \t\tFound ending in rule %d.\n", rules[i + 1]);

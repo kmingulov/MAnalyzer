@@ -28,13 +28,16 @@ int main(int argc, char ** argv)
     {
         success = fscanf(input, "%d", &buffer[current++]);
 
+        if(buffer[current - 1] == -1)
+            current--;
+
         if(success == EOF)
             current--;
 
         c = 0;
         c = fgetc(input);
 
-        if( (c == '\n' || success == EOF) && current != 0 )
+        if( (c == '\n' || success == EOF) )
         {
             fprintf(output, "%d ", current);
             for(int i = 0; i < current; i++)

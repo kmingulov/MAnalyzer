@@ -1,8 +1,6 @@
 #ifndef ANALYZER_HPP
 #define ANALYZER_HPP
 
-#include <dawgdic/dictionary.h>
-
 #include "word_infos.hpp"
 
 /*
