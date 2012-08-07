@@ -14,6 +14,15 @@
 #include "analyzer.hpp"
 
 //******************************************************************************
+// DEBUG DEFINES.
+//******************************************************************************
+#ifdef MANALYZER_DEBUG
+    #define MA_DEBUG(...) fprintf(stderr, __VA_ARGS__);
+#else
+    #define MA_DEBUG(...) {}
+#endif
+
+//******************************************************************************
 // STRUCT.
 //******************************************************************************
 
@@ -45,9 +54,8 @@ struct Analyzer
 
 Analyzer * analyzer_new()
 {
-    #ifdef ANALYZER_DEBUG
-        printf("Analyzer debug mode enabled.\n");
-    #endif
+    MA_DEBUG("[MANALYZER] MAnalyzer debug mode enabled.\n");
+    MA_DEBUG("[MANALYZER] Starting manalyzer.\n");
 
     Analyzer * result = new Analyzer;
 
@@ -77,17 +85,23 @@ Analyzer * analyzer_new()
     // Reading normal forms.
     result -> n_forms = normal_forms_fread("dics/normal_forms");
 
+    MA_DEBUG("[MANALYZER] Succesfully started MAnalyzer.\n");
+
     return result;
 }
 
 void analyzer_free(Analyzer * analyzer)
 {
+    MA_DEBUG("[MANALYZER] Finishing MAnalyzer.\n");
+
     lemmas_rules_free(analyzer -> l_rules);
     endings_rules_free(analyzer -> e_rules);
     forms_free(analyzer -> forms);
     rules_free(analyzer -> rules);
     normal_forms_free(analyzer -> n_forms);
     delete analyzer;
+
+    MA_DEBUG("[MANALYZER] Succesfully finished MAnalyzer.\n");
 }
 
 //******************************************************************************
@@ -112,6 +126,8 @@ static bool analyzer_search_endings(Analyzer * analyzer, AnalyzedWord * aw)
             (aw -> ending_len == 0 && rules_find_ending_in_rule(analyzer -> rules, rules[i + 1], "*", 1, &value))
         )
         {
+            MA_DEBUG("[ANALYSIS] \tFound ending in rule %d.\n", rules[i + 1]);
+
             int count = forms_get_length(analyzer -> forms, value);
             FormInfo * forms = forms_get_form_infos(analyzer -> forms, value);
             // Check for each prefix and forming result.
@@ -139,30 +155,37 @@ static bool analyzer_search_endings(Analyzer * analyzer, AnalyzedWord * aw)
 
                     result = true;
 
-                    #ifdef ANALYZER_DEBUG
-                        printf("\t\tRule %d\n\t\t\tForm %d (normal = %s)\n", rules[i + 1], forms[j].id, nf);
-                    #endif
+                    MA_DEBUG("[ANALYSIS] \t\tAnalysis succeed. Type = %d, normal form = '%s' (%d).\n",
+                        forms[j].id,
+                        nf,
+                        normal_forms_get_type(analyzer -> n_forms, rules[i + 1]));
 
-                    #ifdef QUIET_ANALYZER_DEBUG
-                        char buffer[1024];
+                    MA_DEBUG("[ANALYSIS] \t\tWord's design:\n");
 
-                        memcpy(&buffer[0], aw -> word, aw -> predict_prefix_len * sizeof(char));
-                        buffer[aw -> predict_prefix_len] = '\0';
-                        printf("%s=%s+", aw -> word, &buffer[0]);
+                    #ifdef MANALYZER_DEBUG
+                        char old_char;
 
-                        memcpy(&buffer[0], aw -> prefix, aw -> prefix_len * sizeof(char));
-                        buffer[aw -> prefix_len] = '\0';
-                        printf("%s(%d)+", &buffer[0], aw -> prefix_type);
+                        MA_DEBUG("[ANALYSIS] \t\t\t%s = ", aw -> word);
 
-                        memcpy(&buffer[0], aw -> lemma, aw -> lemma_len * sizeof(char));
-                        buffer[aw -> lemma_len] = '\0';
-                        printf("%s(%d)+", &buffer[0], aw -> lemma_id);
+                        old_char = aw -> word[aw -> predict_prefix_len];
+                        aw -> word[aw -> predict_prefix_len] = '\0';
+                        MA_DEBUG("%s+", aw -> word);
+                        aw -> word[aw -> predict_prefix_len] = old_char;
 
-                        memcpy(&buffer[0], aw -> ending, aw -> ending_len * sizeof(char));
-                        buffer[aw -> ending_len] = '\0';
-                        printf("%s", &buffer[0]);
+                        old_char = aw -> prefix[aw -> prefix_len];
+                        aw -> word[aw -> prefix_len] = '\0';
+                        MA_DEBUG("%s(%d)+", aw -> prefix, aw -> prefix_type);
+                        aw -> word[aw -> prefix_len] = old_char;
 
-                        printf(" = %d\n", forms[j].id);
+                        old_char = aw -> lemma[aw -> lemma_len];
+                        aw -> word[aw -> lemma_len] = '\0';
+                        MA_DEBUG("%s(%d)+", aw -> lemma, aw -> lemma_id);
+                        aw -> word[aw -> lemma_len] = old_char;
+
+                        old_char = aw -> ending[aw -> ending_len];
+                        aw -> word[aw -> ending_len] = '\0';
+                        MA_DEBUG("%s\n", aw -> ending);
+                        aw -> word[aw -> ending_len] = old_char;
                     #endif
                 }
         }
@@ -195,19 +218,12 @@ bool analyzer_search_lemmas(Analyzer * analyzer, AnalyzedWord * aw)
             aw -> ending_len = aw -> word_size - ((q + 1) - aw -> word);
 
             // Debug information.
-            #ifdef ANALYZER_DEBUG
-                // Cut off the begining.
+            #ifdef MANALYZER_DEBUG
                 char old_char = *(q + 1);
                 *(q + 1) = '\0';
-
-                // Printing lemma.
-                printf("\tLemma %s (%d, %d). ", aw -> lemma, aw -> lemma_len, aw -> lemma_id);
-
-                // Restore char.
+                MA_DEBUG("[ANALYSIS] \tFound lemma '%s' (%d, %d). ", aw -> lemma, aw -> lemma_len, aw -> lemma_id);
                 *(q + 1) = old_char;
-
-                // Printing ending.
-                printf("(Possible) ending is %s (%d).\n", aw -> ending, aw -> ending_len);
+                MA_DEBUG("Searching in rules (possible) ending is '%s' (%d).\n", aw -> ending, aw -> ending_len);
             #endif
 
             if(analyzer_search_endings(analyzer, aw))
@@ -222,9 +238,7 @@ bool analyzer_search_lemmas(Analyzer * analyzer, AnalyzedWord * aw)
 // lemmas, it uses special lemma (#). So word is just an ending for this lemma.
 static bool analyzer_special_lemma(Analyzer * analyzer, AnalyzedWord * aw)
 {
-    #ifdef ANALYZER_DEBUG
-        printf("\tLemma # (1, 0). (Possible) ending is %s (%d).\n", aw -> ending, aw -> ending_len);
-    #endif
+    MA_DEBUG("[ANALYSIS] \tFound lemma '#' (1, 0). Searching in rules (possible) ending '%s' (%d).\n", aw -> ending, aw -> ending_len);
 
     return analyzer_search_endings(analyzer, aw);
 }
@@ -239,6 +253,7 @@ static bool analyzer_analyze_lemma(Analyzer * analyzer, AnalyzedWord * aw)
     // Preparing.
     aw -> ending = NULL;
     aw -> ending_len = 0;
+
     // Search lemmas for word.
     if(analyzer_search_lemmas(analyzer, aw))
         return true;
@@ -248,6 +263,7 @@ static bool analyzer_analyze_lemma(Analyzer * analyzer, AnalyzedWord * aw)
     aw -> ending_len = aw -> word_size - (aw -> ending - aw -> word);
     aw -> lemma_len = 0;
     aw -> lemma_id = 0;
+
     // Search endings by special lemma (#, len = 0, id = 0, whole word is
     // ending).
     if(analyzer_special_lemma(analyzer, aw))
@@ -263,6 +279,7 @@ static bool analyzer_analyze_prefix(Analyzer * analyzer, AnalyzedWord * aw)
     aw -> prefix_type = 1;
     aw -> lemma = aw -> prefix;
     aw -> lemma_len = 0;
+
     // Analyze word (without searching prefix).
     if(analyzer_analyze_lemma(analyzer, aw))
         return true;
@@ -280,9 +297,7 @@ static bool analyzer_analyze_prefix(Analyzer * analyzer, AnalyzedWord * aw)
         aw -> lemma = aw -> prefix + 2;
         aw -> lemma_len = 0;
 
-        #ifdef ANALYZER_DEBUG
-            printf("\tPrefix is ÏÎ (2).\n");
-        #endif
+        MA_DEBUG("[ANALYSIS] \tPrefix is ÏÎ (2).\n");
 
         if(analyzer_analyze_lemma(analyzer, aw))
             return true;
@@ -300,9 +315,7 @@ static bool analyzer_analyze_prefix(Analyzer * analyzer, AnalyzedWord * aw)
         aw -> lemma = aw -> prefix + 3;
         aw -> lemma_len = 0;
 
-        #ifdef ANALYZER_DEBUG
-            printf("\tPrefix is ÍÀÈ (3).\n");
-        #endif
+        MA_DEBUG("[ANALYSIS] \tPrefix is ÍÀÈ (3).\n");
 
         if(analyzer_analyze_lemma(analyzer, aw))
             return true;
@@ -321,6 +334,8 @@ bool analyzer_predict(Analyzer * analyzer, AnalyzedWord * aw);
 
 bool analyzer_get_word_info(Analyzer * analyzer, char * word, unsigned int word_size, WordInfos * buffer)
 {
+    MA_DEBUG("[ANALYSIS] Start analysis for '%s'.\n", word);
+
     AnalyzedWord * aw = analyzed_word_new(word, word_size, buffer);
     aw -> prefix = word;
 
@@ -329,6 +344,7 @@ bool analyzer_get_word_info(Analyzer * analyzer, char * word, unsigned int word_
     // Analyze whole word.
     if(analyzer_analyze_prefix(analyzer, aw))
     {
+        MA_DEBUG("[ANALYSIS] Finish analysis.\n");
         analyzed_word_free(aw);
         return true;
     }
@@ -347,27 +363,28 @@ bool analyzer_get_word_info(Analyzer * analyzer, char * word, unsigned int word_
             aw -> predict_prefix_len = q + 1 - word;
 
             // Debug information.
-            #ifdef ANALYZER_DEBUG
-                // Cutting off the begining.
+            #ifdef MANALYZER_DEBUG
                 char old_char = *(q + 1);
                 *(q + 1) = '\0';
-
-                printf("\tPredict prefix is %s (%d)\n", aw -> word, q + 1 - aw -> word);
-
-                // Restoring the char.
+                MA_DEBUG("[ANALYSIS] \tFound predict prefix '%s' (%d).\n", aw -> word, q + 1 - aw -> word);
                 *(q + 1) = old_char;
             #endif
 
             if(analyzer_analyze_prefix(analyzer, aw))
             {
+                MA_DEBUG("[ANALYSIS] Finish analysis.\n");
                 analyzed_word_free(aw);
                 return true;
             }
         }
     }
 
+    MA_DEBUG("[ANALYSIS] Analysis failed. Trying prediction.\n");
+
+    bool result = analyzer_predict(analyzer, aw);
     analyzed_word_free(aw);
-    return false;
+
+    return result;
 }
 
 //******************************************************************************
@@ -378,9 +395,7 @@ bool analyzer_predict(Analyzer * analyzer, AnalyzedWord * aw)
 {
     bool result = false;
 
-    #ifdef ANALYZER_DEBUG
-        fprintf(stderr, "[PREDICTION] Start prediction for '%s'\n", aw -> word);
-    #endif
+    MA_DEBUG("[PREDICTION] Start prediction for '%s'.\n", aw -> word);
 
     // TODO Check for #+ending?
 
@@ -388,6 +403,7 @@ bool analyzer_predict(Analyzer * analyzer, AnalyzedWord * aw)
     // Note: we store endings reversed (i.e. ending abcde stored as edcba). By
     // this trick we can use prefix search (we can call it "reversed ending
     // search").
+
     char * end = aw -> word + aw -> word_size;
     dawgdic::BaseType index = analyzer -> endings.root();
     for(char * q = end - 1; end - q <= 5 && q >= aw -> word; q--)
@@ -401,9 +417,7 @@ bool analyzer_predict(Analyzer * analyzer, AnalyzedWord * aw)
             int ending_id = analyzer -> endings.value(index);
             unsigned short int * rules = endings_rules_get(analyzer -> e_rules, ending_id);
 
-            #ifdef ANALYZER_DEBUG
-                fprintf(stderr, "[PREDICTION] \tFound ending '%s' (%d, %d)\n", q, end - q, ending_id);
-            #endif
+            MA_DEBUG("[PREDICTION] \tFound ending '%s' (%d, %d).\n", q, end - q, ending_id);
 
             // Go through each rule.
             for(int i = 0; i < rules[0]; i++)
@@ -412,9 +426,7 @@ bool analyzer_predict(Analyzer * analyzer, AnalyzedWord * aw)
                 int value;
                 if(rules_find_ending_in_rule(analyzer -> rules, rules[i + 1], q, end - q, &value))
                 {
-                    #ifdef ANALYZER_DEBUG
-                        fprintf(stderr, "[PREDICTION] \t\tFound ending in rule %d\n", rules[i + 1]);
-                    #endif
+                    MA_DEBUG("[PREDICTION] \t\tFound ending in rule %d.\n", rules[i + 1]);
 
                     int count = forms_get_length(analyzer -> forms, value);
                     FormInfo * forms = forms_get_form_infos(analyzer -> forms, value);
@@ -438,14 +450,15 @@ bool analyzer_predict(Analyzer * analyzer, AnalyzedWord * aw)
                             normal_forms_get_type(analyzer -> n_forms, rules[i + 1]),
                             forms[j].id);
 
-                        #ifdef ANALYZER_DEBUG
-                            fprintf(stderr, "[PREDICTION] \t\t\tPrediction succeed. Type = %d, normal form = '%s' (%d).\n", forms[j].id, nf, normal_forms_get_type(analyzer -> n_forms, rules[i + 1]));
-                        #endif
+                        MA_DEBUG("[PREDICTION] \t\t\tPrediction succeed. Type = %d, normal form = '%s' (%d).\n", forms[j].id, nf, normal_forms_get_type(analyzer -> n_forms, rules[i + 1]));
                     }
                 }
             }
         }
     }
+
+    if(!result)
+        MA_DEBUG("[PREDICTION] Prediction failed. Cannot analyse word '%s'.\n", aw -> word);
 
     return result;
 }

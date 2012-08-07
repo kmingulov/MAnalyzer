@@ -1,7 +1,5 @@
-ifeq ($(d), 1)
-	DEBUG_MODE = -DANALYZER_DEBUG=1
-else ifeq ($(d), 2)
-	DEBUG_MODE = -DQUIET_ANALYZER_DEBUG=1
+ifeq ($(debug), true)
+	DEBUG_MODE = -DMANALYZER_DEBUG=1
 else
 	DEBUG_MODE =
 endif
