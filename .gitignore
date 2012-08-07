@@ -8,6 +8,7 @@
 * Files for tests.
 input*
 result*
+log*
 
 # Executable files.
 ma

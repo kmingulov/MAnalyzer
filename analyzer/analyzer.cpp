@@ -289,41 +289,46 @@ static bool analyzer_analyze_prefix(Analyzer * analyzer, AnalyzedWord * aw)
     // Search prefix and analyze the rest part of the word.
     // TODO Brute method. Maybe improve it?
     char * word = aw -> prefix;
-    char old_char = word[2]; word[2] = '\0';
-    if(strcmp(word, "œŒ") == 0)
+    char old_char;
+    if(aw -> word_size - aw -> predict_prefix_len >= 2)
     {
+        old_char = word[2]; word[2] = '\0';
+        if(strcmp(word, "œŒ") == 0)
+        {
+            word[2] = old_char;
+
+            aw -> prefix_type = 2;
+            aw -> prefix_len = 2;
+            aw -> lemma = aw -> prefix + 2;
+            aw -> lemma_len = 0;
+
+            MA_DEBUG("[ANALYSIS] \tPrefix is œŒ (2).\n");
+
+            if(analyzer_analyze_lemma(analyzer, aw))
+                return true;
+        }
         word[2] = old_char;
-
-        aw -> prefix_type = 2;
-        aw -> prefix_len = 2;
-        aw -> lemma = aw -> prefix + 2;
-        aw -> lemma_len = 0;
-
-        MA_DEBUG("[ANALYSIS] \tPrefix is œŒ (2).\n");
-
-        if(analyzer_analyze_lemma(analyzer, aw))
-            return true;
     }
 
-    word[2] = old_char;
-
-    old_char = word[3]; word[3] = '\0';
-    if(strcmp(word, "Õ¿»") == 0)
+    if(aw -> word_size - aw -> predict_prefix_len >= 3)
     {
+        old_char = word[3]; word[3] = '\0';
+        if(strcmp(word, "Õ¿»") == 0)
+        {
+            word[3] = old_char;
+
+            aw -> prefix_type = 3;
+            aw -> prefix_len = 3;
+            aw -> lemma = aw -> prefix + 3;
+            aw -> lemma_len = 0;
+
+            MA_DEBUG("[ANALYSIS] \tPrefix is Õ¿» (3).\n");
+
+            if(analyzer_analyze_lemma(analyzer, aw))
+                return true;
+        }
         word[3] = old_char;
-
-        aw -> prefix_type = 3;
-        aw -> prefix_len = 3;
-        aw -> lemma = aw -> prefix + 3;
-        aw -> lemma_len = 0;
-
-        MA_DEBUG("[ANALYSIS] \tPrefix is Õ¿» (3).\n");
-
-        if(analyzer_analyze_lemma(analyzer, aw))
-            return true;
     }
-
-    word[3] = old_char;
 
     return false;
 }

@@ -78,7 +78,7 @@ void infos_erase(WordInfos * wi)
     wi -> prediction = false;
 }
 
-bool infos_prepend_word(WordInfos * wi, char * form, unsigned short int n_form_id, unsigned short int form_id, bool prediction = false)
+bool infos_prepend_word(WordInfos * wi, char * form, unsigned short int n_form_id, unsigned short int form_id, bool prediction)
 {
     if(wi == NULL)
         return false;

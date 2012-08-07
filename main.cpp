@@ -40,7 +40,7 @@ void analyze_file(Analyzer * analyzer, const char * filename)
         }
         infos_erase(wi);
     }
-//~ 
+
     infos_free(wi);
 }
 
@@ -48,20 +48,20 @@ int main()
 {
     Analyzer * analyzer = analyzer_new();
 
-    //~ analyze_file(analyzer, "input");
+    analyze_file(analyzer, "input");
 
-    char buffer[1024];
-    WordInfos * wi = infos_new(1024);
-
-    while(fgets(&buffer[0], 1024, stdin))
-    {
-        int len = strlen(&buffer[0]) - 1;
-        buffer[len] = '\0';
-
-        analyzer_get_word_info(analyzer, &buffer[0], len, wi);
-    }
-
-    infos_free(wi);
+    //~ char buffer[1024];
+    //~ WordInfos * wi = infos_new(1024);
+//~ 
+    //~ while(fgets(&buffer[0], 1024, stdin))
+    //~ {
+        //~ int len = strlen(&buffer[0]) - 1;
+        //~ buffer[len] = '\0';
+//~ 
+        //~ analyzer_get_word_info(analyzer, &buffer[0], len, wi);
+    //~ }
+//~ 
+    //~ infos_free(wi);
 
     //~ char word[] = {"анланланл"};
     //~ WordInfos * wi = infos_new(1024);
