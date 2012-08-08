@@ -5,7 +5,6 @@
 
 #include <cstdlib>
 #include <cstring>
-#include <ctime>
 
 #include "forms.hpp"
 #include "rules.hpp"
@@ -20,11 +19,9 @@
 // DEBUG DEFINES.
 //******************************************************************************
 #ifdef MANALYZER_DEBUG
-    #define MA_DEBUG(...) { fprintf(stderr, "[%d]", time(NULL)); fprintf(stderr, __VA_ARGS__); }
-    #define MA_DEBUG_(...) { fprintf(stderr, __VA_ARGS__); }
+    #define MA_DEBUG(...) { fprintf(stderr, __VA_ARGS__); }
 #else
     #define MA_DEBUG(...) {}
-    #define MA_DEBUG_(...) {}
 #endif
 
 //******************************************************************************
@@ -174,22 +171,22 @@ static bool analyzer_search_endings(Analyzer * analyzer, AnalyzedWord * aw)
 
                         old_char = aw -> word[aw -> predict_prefix_len];
                         aw -> word[aw -> predict_prefix_len] = '\0';
-                        MA_DEBUG_("%s+", aw -> word);
+                        MA_DEBUG("%s+", aw -> word);
                         aw -> word[aw -> predict_prefix_len] = old_char;
 
                         old_char = aw -> prefix[aw -> prefix_len];
                         aw -> prefix[aw -> prefix_len] = '\0';
-                        MA_DEBUG_("%s(%d)+", aw -> prefix, aw -> prefix_type);
+                        MA_DEBUG("%s(%d)+", aw -> prefix, aw -> prefix_type);
                         aw -> prefix[aw -> prefix_len] = old_char;
 
                         old_char = aw -> lemma[aw -> lemma_len];
                         aw -> lemma[aw -> lemma_len] = '\0';
-                        MA_DEBUG_("%s(%d)+", aw -> lemma, aw -> lemma_id);
+                        MA_DEBUG("%s(%d)+", aw -> lemma, aw -> lemma_id);
                         aw -> lemma[aw -> lemma_len] = old_char;
 
                         old_char = aw -> ending[aw -> ending_len];
                         aw -> ending[aw -> ending_len] = '\0';
-                        MA_DEBUG_("%s\n", aw -> ending);
+                        MA_DEBUG("%s\n", aw -> ending);
                         aw -> ending[aw -> ending_len] = old_char;
                     #endif
                 }
@@ -228,7 +225,7 @@ bool analyzer_search_lemmas(Analyzer * analyzer, AnalyzedWord * aw)
                 *(q + 1) = '\0';
                 MA_DEBUG("[ANALYSIS] \tFound lemma '%s' (%d, %d). ", aw -> lemma, aw -> lemma_len, aw -> lemma_id);
                 *(q + 1) = old_char;
-                MA_DEBUG_("Searching in rules (possible) ending is '%s' (%d).\n", aw -> ending, aw -> ending_len);
+                MA_DEBUG("Searching in rules (possible) ending is '%s' (%d).\n", aw -> ending, aw -> ending_len);
             #endif
 
             if(analyzer_search_endings(analyzer, aw))
@@ -431,7 +428,6 @@ bool analyzer_predict(Analyzer * analyzer, AnalyzedWord * aw)
             {
                 // Searching ending in rule's dawgdic.
                 int value;
-                std::cout << rules[i + 1] << "\n";
                 if(rules_find_ending_in_rule(analyzer -> rules, rules[i + 1], q, end - q, &value))
                 {
                     MA_DEBUG("[PREDICTION] \t\tFound ending in rule %d.\n", rules[i + 1]);
