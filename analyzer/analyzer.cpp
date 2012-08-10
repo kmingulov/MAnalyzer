@@ -54,38 +54,50 @@ struct Analyzer
 // CREATING/DESTROYING
 //******************************************************************************
 
-Analyzer * analyzer_new()
+Analyzer * analyzer_new(const char * dirname)
 {
     MA_DEBUG("[MANALYZER] MAnalyzer debug mode enabled.\n");
     MA_DEBUG("[MANALYZER] Starting manalyzer.\n");
+    MA_DEBUG("[MANALYZER] Dictionary dir is '%s'.\n", dirname);
 
     Analyzer * result = new Analyzer;
 
+    // Preparing buffer (for filename).
+    std::string path;
+
     // Reading dictionaries from files.
     // Predict prefixes...
-    std::ifstream predict_prefixes_file("dics/predict_prefixes.dawgdic", std::ios::binary);
+    path = dirname; path += "/predict_prefixes.dawgdic";
+    std::ifstream predict_prefixes_file(path.c_str(), std::ios::binary );
     result -> predict_prefixes.Read(&predict_prefixes_file);
 
     // ...lemmas...
-    std::ifstream lemmas_file("dics/lemmas.dawgdic", std::ios::binary);
+    path = dirname; path += "/lemmas.dawgdic";
+    std::ifstream lemmas_file(path.c_str(), std::ios::binary );
     result -> lemmas.Read(&lemmas_file);
 
     // ...and endings.
-    std::ifstream endings_file("dics/endings.dawgdic", std::ios::binary);
+    path = dirname; path += "/endings.dawgdic";
+    std::ifstream endings_file(path.c_str(), std::ios::binary );
     result -> endings.Read(&endings_file);
 
     // Reading lemmas and endings rules.
-    result -> l_rules = lemmas_rules_fread("dics/lemmas_rules");
-    result -> e_rules = endings_rules_fread("dics/endings_rules");
+    path = dirname; path += "/lemmas_rules";
+    result -> l_rules = lemmas_rules_fread(path.c_str());
+    path = dirname; path += "/endings_rules";
+    result -> e_rules = endings_rules_fread(path.c_str());
 
     // Reading all forms from file.
-    result -> forms = forms_fread("dics/rules/forms");
+    path = dirname; path += "/rules/forms";
+    result -> forms = forms_fread(path.c_str());
 
     // Reading rules from directory.
-    result -> rules = rules_dread("dics/rules");
+    path = dirname; path += "/rules";
+    result -> rules = rules_dread(path.c_str());
 
     // Reading normal forms.
-    result -> n_forms = normal_forms_fread("dics/normal_forms");
+    path = dirname; path += "/normal_forms";
+    result -> n_forms = normal_forms_fread(path.c_str());
 
     MA_DEBUG("[MANALYZER] Succesfully started MAnalyzer.\n");
 

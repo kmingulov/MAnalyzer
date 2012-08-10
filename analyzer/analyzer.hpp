@@ -9,9 +9,9 @@
 struct Analyzer;
 
 /*
-    Loads analyzer.
+    Loads analyzer. Dictionary is located in dirname dir.
 */
-Analyzer * analyzer_new();
+Analyzer * analyzer_new(const char * dirname);
 
 /*
     Unloads analyzer.

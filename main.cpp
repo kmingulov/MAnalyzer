@@ -46,7 +46,7 @@ void analyze_file(Analyzer * analyzer, const char * filename)
 
 int main()
 {
-    Analyzer * analyzer = analyzer_new();
+    Analyzer * analyzer = analyzer_new("dics");
 
     //~ analyze_file(analyzer, "input");
 
