@@ -8,7 +8,7 @@ int main()
 
     vector < vector <int> > lens;
 
-    int count;
+    int count = 0;
     rules >> count;
 
     for(int i = 0; i < count; i++)
