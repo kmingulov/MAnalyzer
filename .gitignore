@@ -18,6 +18,8 @@ create_dics/make_dawgdics
 create_dics/rules_split_and_sort
 create_dics/rules_dics
 create_dics/normal_forms
+create_dics/ending_rule
+create_dics/add_endings_lens
 
 # Backups and temporary data.
 *~

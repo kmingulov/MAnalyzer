@@ -5,7 +5,7 @@ RECODE = recode
 C = gcc
 C++ = g++
 
-all: make_dawgdics make_rules rules_split_and_sort rules_dics normal_forms
+all: make_dawgdics make_rules rules_split_and_sort rules_dics normal_forms ending_rule add_endings_lens
 	mkdir -p ../dics
 	mkdir -p temp
 
@@ -19,7 +19,7 @@ all: make_dawgdics make_rules rules_split_and_sort rules_dics normal_forms
 	# Raw rules.
 	$(SQLITE) sqlite/rules.sqlite "SELECT value FROM shelf;" | sed s/\"\"/*/g | sed s/[\]\[\",]//g > temp/raw_rules
 	# Endings (for prediction).
-	$(SQLITE) sqlite/endings.sqlite "SELECT * FROM shelf ORDER BY key;" | sed s/"{}"/-1/g | sed s/"[][]"/_/g | sed s/"[\",\ ]"//g | sed s/"_[0-9]*_"//g | sed s/":}"//g | sed s/{//g | sed s/[:\|]/" "/g > temp/endings # Seems like I know regexps horribly. TODO Make it better?
+	$(SQLITE) sqlite/endings.sqlite "SELECT * FROM shelf ORDER BY key;" > temp/endings
 
 	# Prepare lemmas lexicon.
 	$(RECODE) utf8..cp1251 temp/lemmas
@@ -27,13 +27,16 @@ all: make_dawgdics make_rules rules_split_and_sort rules_dics normal_forms
 	sort temp/predict_prefixes > temp/predict_prefixes_sorted
 	$(RECODE) utf8..cp1251 temp/predict_prefixes_sorted
 	# Prepare endings lexicon. (See make_dawgdics.cpp for some notes.)
-	# Too slow.
+	$(RECODE) -f utf8..cp1251 temp/endings;
+	# Make reversed endings, add counts and delete excess chars.
 	cat temp/endings | while read line; do \
-		end=`echo "$$line" | cut -d' ' -f1 | rev`; \
-		rules=`echo "$$line" | cut -d' ' -f2-`; \
-		echo "$$end $$rules" >> temp/endings_reversed; \
+		new_line=`echo "$$line" | ./ending_rule`; \
+		echo "$$new_line" >> temp/endings_reversed; \
 	done;
-	sort -k1 -t' ' temp/endings_reversed > temp/endings_sorted;
+	# Sort.
+	$(RECODE) -f cp1251..utf8 temp/endings_reversed;
+	sort temp/endings_reversed > temp/endings_sorted;
+	# Split to 2 files.
 	cat temp/endings_sorted | while read line; do \
 		end=`echo "$$line" | cut -d' ' -f1`; \
 		rules=`echo "$$line" | cut -d' ' -f2-`; \
@@ -44,12 +47,14 @@ all: make_dawgdics make_rules rules_split_and_sort rules_dics normal_forms
 	# Creating dawgdics.
 	./make_dawgdics
 
-	# Making lemmas_rules and endings_rules
+	# Making lemmas_rules and preparing endings_rules
 	./make_rules temp/lemmas_rules ../dics/lemmas_rules
-	./make_rules temp/endings_rules ../dics/endings_rules
 	# Add count of rules to the first line.
 	sed -i "1i`wc -l ../dics/lemmas_rules | cut -f1 --delimiter=' '`" ../dics/lemmas_rules
-	sed -i "1i`wc -l ../dics/endings_rules | cut -f1 --delimiter=' '`" ../dics/endings_rules
+	sed -i "1i`wc -l temp/endings_rules | cut -f1 --delimiter=' '`" temp/endings_rules
+
+	# Making ending_rules.
+	./add_endings_lens
 
 	# Making gramtab.
 	$(SQLITE) sqlite/misc.sqlite "SELECT value FROM shelf WHERE key='gramtab'" | \
@@ -96,6 +101,9 @@ make_dawgdics: make_dawgdics.cpp
 make_rules: make_rules.c
 	$(C) -g -std=c99 -o make_rules make_rules.c
 
+ending_rule: ending_rule.c
+	$(C) -g -std=c99 -o ending_rule ending_rule.c
+
 rules_split_and_sort: rules_split_and_sort.cpp
 	$(C++) -g -o rules_split_and_sort rules_split_and_sort.cpp
 
@@ -104,6 +112,9 @@ rules_dics: rules_dics.cpp
 
 normal_forms: normal_forms.cpp
 	$(C++) -g -o normal_forms normal_forms.cpp
+
+add_endings_lens: add_endings_lens.cpp
+	$(C++) -g -o add_endings_lens add_endings_lens.cpp
 
 clean:
 	rm -rf ../dics
