@@ -1,13 +1,26 @@
 #ifndef ENDINGS_RULES_HPP
 #define ENDINGS_RULES_HPP
 
-// TODO: Identical to LemmasRules. Use templates or not?
-
 /*
     Struct of endings rules. This struct compare each ending id to ids of it's
     rules.
 */
-struct EndingsRules;
+struct EndingsRules
+{
+    int count;
+
+    // Array with counts of rules for each ending.
+    unsigned short int * counts;
+
+    // Array with rules ids.
+    unsigned short int ** rules;
+
+    // Array with start indexes for endings' lens (for char * lens).
+    unsigned int ** indexes;
+
+    // Array with lens.
+    char * lens;
+};
 
 /*
     Reads lemmas rules from file.
