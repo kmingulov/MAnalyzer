@@ -422,6 +422,8 @@ bool analyzer_predict(Analyzer * analyzer, AnalyzedWord * aw)
 
     char * end = aw -> word + aw -> word_size;
     dawgdic::BaseType index = analyzer -> endings.root();
+
+    // Start lookup from the end.
     for(char * q = end - 1; end - q <= 5 && q >= aw -> word; q--)
     {
         if(!analyzer -> endings.Follow(*q, &index))
@@ -450,46 +452,50 @@ bool analyzer_predict(Analyzer * analyzer, AnalyzedWord * aw)
                 while(*l != -1)
                 {
                     // Cutting *l chars -- it's an ending.
-                    char * ending = &aw -> word[aw -> word_size - *l];
-                    MA_DEBUG("[PREDICTION] \t\t\tCutting '%s' as ending.\n", ending);
-
-                    int value;
-                    if
-                    (
-                        // Non-null ending.
-                        ( *ending != '\0' && rules_find_ending_in_rule(analyzer -> rules, rules_ids[i], ending, end - ending, &value) ) ||
-                        // Null ending.
-                        ( *ending == '\0' && rules_find_ending_in_rule(analyzer -> rules, rules_ids[i], "*", 1, &value) )
-                    )
+                    // First of all -- check it's enough letters for it.
+                    if(aw -> word_size > *l)
                     {
-                        int count = forms_get_length(analyzer -> forms, value);
-                        FormInfo * forms = forms_get_form_infos(analyzer -> forms, value);
+                        char * ending = &aw -> word[aw -> word_size - *l];
+                        MA_DEBUG("[PREDICTION] \t\t\tCutting '%s' as ending.\n", ending);
 
-                        for(int j = 0; j < count; j++)
+                        int value;
+                        if
+                        (
+                            // Non-null ending.
+                            ( *ending != '\0' && rules_find_ending_in_rule(analyzer -> rules, rules_ids[i], ending, end - ending, &value) ) ||
+                            // Null ending.
+                            ( *ending == '\0' && rules_find_ending_in_rule(analyzer -> rules, rules_ids[i], "*", 1, &value) )
+                        )
                         {
-                            result = true;
+                            int count = forms_get_length(analyzer -> forms, value);
+                            FormInfo * forms = forms_get_form_infos(analyzer -> forms, value);
 
-                            char * nf_ending = normal_forms_get_ending(analyzer -> n_forms, rules_ids[i]);
-                            int nf_ending_len = normal_forms_get_ending_len(analyzer -> n_forms, rules_ids[i]);
-                            int w_len = aw -> word_size - (*l);
-                            int nf_len = w_len + nf_ending_len;
+                            for(int j = 0; j < count; j++)
+                            {
+                                result = true;
 
-                            // Creating new char string -- word in normal form.
-                            char * nf = (char *) malloc(sizeof(char) * (nf_len + 1));
+                                char * nf_ending = normal_forms_get_ending(analyzer -> n_forms, rules_ids[i]);
+                                int nf_ending_len = normal_forms_get_ending_len(analyzer -> n_forms, rules_ids[i]);
+                                int w_len = aw -> word_size - (*l);
+                                int nf_len = w_len + nf_ending_len;
 
-                            // Copying the rest part of the original word and normal
-                            // form ending.
-                            memcpy(nf, aw -> word, w_len * sizeof(char));
-                            memcpy(&nf[w_len], nf_ending, nf_ending_len * sizeof(char));
-                            nf[nf_len] = '\0';
+                                // Creating new char string -- word in normal form.
+                                char * nf = (char *) malloc(sizeof(char) * (nf_len + 1));
 
-                            infos_prepend_word(aw -> infos,
-                                nf,
-                                normal_forms_get_type(analyzer -> n_forms, rules_ids[i]),
-                                forms[j].id,
-                                true);
+                                // Copying the rest part of the original word and normal
+                                // form ending.
+                                memcpy(nf, aw -> word, w_len * sizeof(char));
+                                memcpy(&nf[w_len], nf_ending, nf_ending_len * sizeof(char));
+                                nf[nf_len] = '\0';
 
-                            MA_DEBUG("[PREDICTION] \t\t\t\tPrediction succeed. Type = %d, normal form = '%s' (%d).\n", forms[j].id, nf, normal_forms_get_type(analyzer -> n_forms, rules_ids[i]));
+                                infos_prepend_word(aw -> infos,
+                                    nf,
+                                    normal_forms_get_type(analyzer -> n_forms, rules_ids[i]),
+                                    forms[j].id,
+                                    true);
+
+                                MA_DEBUG("[PREDICTION] \t\t\t\tPrediction succeed. Type = %d, normal form = '%s' (%d).\n", forms[j].id, nf, normal_forms_get_type(analyzer -> n_forms, rules_ids[i]));
+                            }
                         }
                     }
 

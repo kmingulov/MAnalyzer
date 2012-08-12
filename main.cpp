@@ -35,7 +35,7 @@ void analyze_file(Analyzer * analyzer, const char * filename)
         }
         else
         {
-            //~ printf("%s\n", text[i]);
+            printf("%s\n", text[i]);
             //~ printf("%d\n", 0);
         }
         infos_erase(wi);
@@ -62,11 +62,6 @@ int main()
     }
 
     infos_free(wi);
-
-    //~ char word[] = {"анланланл"};
-    //~ WordInfos * wi = infos_new(1024);
-//~ 
-    //~ analyzer_get_word_info(analyzer, word, strlen(word), wi);
 
     analyzer_free(analyzer);
 
