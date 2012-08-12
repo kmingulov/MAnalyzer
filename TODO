@@ -1,10 +1,8 @@
 Features:
-    * Improve prediction.
+    * In prediction: add in result only words got by ending with most length.
 
 Algo:
     * Prefixes (ПО and НАИ) are hardcoded now. Fix?
 
 Code:
-    * The main code of the analyzer is horrible. I need to think about it and
-      improve it or rewrite.
     * Check all TODOs

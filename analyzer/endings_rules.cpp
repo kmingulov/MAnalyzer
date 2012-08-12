@@ -5,27 +5,31 @@
 #include "endings_rules.hpp"
 
 //******************************************************************************
-// STRUCT
+// DEFINES
 //******************************************************************************
 
 #define LENS_ARRAY_SIZE                 1024 * 1024
 
-//~ struct EndingsRules
-//~ {
-    //~ int count;
-//~ 
-    //~ // Array with counts of rules for each ending.
-    //~ unsigned short int * counts;
-//~ 
-    //~ // Array with rules ids.
-    //~ unsigned short int ** rules;
-//~ 
-    //~ // Array with start indexes for endings' lens (for char * lens).
-    //~ unsigned int ** indexes;
-//~ 
-    //~ // Array with lens.
-    //~ char * lens;
-//~ };
+//******************************************************************************
+// STRUCT
+//******************************************************************************
+
+struct EndingsRules
+{
+    int count;
+
+    // Array with counts of rules for each ending.
+    unsigned short int * counts;
+
+    // Array with rules ids.
+    unsigned short int ** rules;
+
+    // Array with start indexes for endings' lens (for char * lens).
+    unsigned int ** indexes;
+
+    // Array with lens.
+    char * lens;
+};
 
 //******************************************************************************
 // LEMMAS RULES READING/FREEING
@@ -102,7 +106,22 @@ void endings_rules_free(EndingsRules * rules)
     free(rules);
 }
 
-
 //******************************************************************************
 // ACCESS DATA
 //******************************************************************************
+
+unsigned short int endings_rules_get_rules_count(EndingsRules * rules, unsigned int ending_id)
+{
+    return rules -> counts[ending_id];
+}
+
+unsigned short int * endings_rules_get_rules_ids(EndingsRules * rules, unsigned int ending_id)
+{
+    return rules -> rules[ending_id];
+}
+
+char * endings_rules_get_endings_lens(EndingsRules * rules, unsigned int ending_id, unsigned int id)
+{
+    unsigned int start_index = rules -> indexes[ending_id][id];
+    return &rules -> lens[start_index];
+}

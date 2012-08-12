@@ -434,11 +434,8 @@ bool analyzer_predict(Analyzer * analyzer, AnalyzedWord * aw)
         {
             int ending_id = analyzer -> endings.value(index);
 
-            unsigned short int rules_count = analyzer -> e_rules -> counts[ending_id];
-            unsigned short int * rules_ids = analyzer -> e_rules -> rules[ending_id];
-            unsigned int * indexes = analyzer -> e_rules -> indexes[ending_id];
-
-            char * lens = analyzer -> e_rules -> lens;
+            unsigned short int rules_count = endings_rules_get_rules_count(analyzer -> e_rules, ending_id);
+            unsigned short int * rules_ids = endings_rules_get_rules_ids(analyzer -> e_rules, ending_id);
 
             MA_DEBUG("[PREDICTION] \tFound ending '%s' (%d, %d).\n", q, end - q, ending_id);
 
@@ -447,7 +444,7 @@ bool analyzer_predict(Analyzer * analyzer, AnalyzedWord * aw)
             {
                 MA_DEBUG("[PREDICTION] \t\tRule is %d.\n", rules_ids[i]);
 
-                char * l = &lens[ indexes[i] ];
+                char * l = endings_rules_get_endings_lens(analyzer -> e_rules, ending_id, i);
 
                 while(*l != -1)
                 {

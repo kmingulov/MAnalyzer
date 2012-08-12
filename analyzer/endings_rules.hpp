@@ -5,22 +5,7 @@
     Struct of endings rules. This struct compare each ending id to ids of it's
     rules.
 */
-struct EndingsRules
-{
-    int count;
-
-    // Array with counts of rules for each ending.
-    unsigned short int * counts;
-
-    // Array with rules ids.
-    unsigned short int ** rules;
-
-    // Array with start indexes for endings' lens (for char * lens).
-    unsigned int ** indexes;
-
-    // Array with lens.
-    char * lens;
-};
+struct EndingsRules;
 
 /*
     Reads lemmas rules from file.
@@ -33,8 +18,20 @@ EndingsRules * endings_rules_fread(const char * filename);
 void endings_rules_free(EndingsRules * rules);
 
 /*
-    Gets the pointer to the array with ids of rules.
+    Gets amount of rules for the ending.
 */
-unsigned short int * endings_rules_get(EndingsRules * rules, unsigned int ending_id);
+unsigned short int endings_rules_get_rules_count(EndingsRules * rules, unsigned int ending_id);
+
+/*
+    Gets array with rules' ids.
+*/
+unsigned short int * endings_rules_get_rules_ids(EndingsRules * rules, unsigned int ending_id);
+
+/*
+    Gets array with endings lengths. All lengths greater than or equal 0. Array
+    ends with -1.
+    Unsigned int id is index number, not rule id!
+*/
+char * endings_rules_get_endings_lens(EndingsRules * rules, unsigned int ending_id, unsigned int id);
 
 #endif
