@@ -90,6 +90,7 @@ all: make_dawgdics make_rules rules_split_and_sort rules_dics normal_forms endin
 	$(RECODE) -f utf8..cp1251 temp/splitted/*
 	mkdir -p ../dics/rules/
 	./rules_dics
+	cp temp/splitted/info ../dics/rules/info
 	# Add count of forms to the first line.
 	sed -i "1i`wc -l ../dics/rules/forms | cut -f1 --delimiter=' '`" ../dics/rules/forms
 

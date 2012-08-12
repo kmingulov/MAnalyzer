@@ -103,15 +103,6 @@ void forms_update_form(Forms * forms, unsigned int index, unsigned short int id,
 //******************************************************************************
 int main()
 {
-    //~ Forms * f = forms_new(15);
-//~ 
-    //~ forms_add_form(f, 1, 0);
-    //~ for(int i = 2; i < 10; i++)
-        //~ forms_update_form(f, 0, i, 0);
-//~ 
-    //~ for(int i = 0; i < 9; i++)
-        //~ cout << (unsigned short int) f -> forms[0][i] << " " << (unsigned short int) (f -> forms[0][i] - MASK_NEXT_MARKER) << endl;
-
     char buffer[1024];
 
     ifstream info("temp/splitted/info");

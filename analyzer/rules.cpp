@@ -12,9 +12,11 @@
 
 struct Rules
 {
+    // Count of dics.
+    unsigned int count;
+
     // Dics (with endings) for rules.
-    // TODO Constant?
-    dawgdic::Dictionary dics[2766];
+    dawgdic::Dictionary * dics;
 };
 
 //******************************************************************************
@@ -23,25 +25,36 @@ struct Rules
 
 Rules * rules_dread(const char * dirname)
 {
-    Rules * rules = new Rules;
+    Rules * rules = (Rules *) malloc(sizeof(Rules));
 
-    char path[1024];
+    // Buffer for file paths.
+    char * path = (char *) malloc(sizeof(char) * 1024);
 
-    // TODO Constant?
-    for(int i = 0; i < 2766; i++)
+    // Reading count.
+    sprintf(path, "%s/info", dirname);
+    std::ifstream info(path);
+    info >> rules -> count;
+    info.close();
+
+    rules -> dics = new dawgdic::Dictionary [rules -> count];
+
+    for(int i = 0; i < rules -> count; i++)
     {
-        sprintf(&path[0], "%s/%d.dawgdic", dirname, i);
+        sprintf(path, "%s/%d.dawgdic", dirname, i);
 
-        std::ifstream file(&path[0], std::ios::binary);
+        std::ifstream file(path, std::ios::binary);
         rules -> dics[i].Read(&file);
     }
+
+    free(path);
 
     return rules;
 }
 
 void rules_free(Rules * rules)
 {
-    delete rules;
+    delete [] rules -> dics;
+    free(rules);
 }
 
 //******************************************************************************
