@@ -38,3 +38,8 @@ To get information about word use these functions:
     unsigned short int infos_get_normal_form_id(WordInfos * wi, unsigned int id);
     // Gets form's id for analyzed word.
     unsigned short int infos_get_form_id(WordInfos * wi, unsigned int id);
+
+TODO
+----
+* In prediction: add in result array only words got by ending with most length.
+* Prefixes (ПО and НАИ) are hardcoded now. Fix?

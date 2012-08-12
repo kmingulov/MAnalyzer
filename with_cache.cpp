@@ -11,7 +11,7 @@
 
 int main()
 {
-    Analyzer * analyzer = analyzer_new();
+    Analyzer * analyzer = analyzer_new("dics");
     WordInfos * wi = infos_new(1024);
     std::map <std::string, bool> cache;
 

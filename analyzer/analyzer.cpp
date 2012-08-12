@@ -413,8 +413,6 @@ bool analyzer_predict(Analyzer * analyzer, AnalyzedWord * aw)
 
     MA_DEBUG("[PREDICTION] Start prediction for '%s'.\n", aw -> word);
 
-    // TODO Check for #+ending?
-
     // Check the possible endings of the word (with length up to 5 letters).
     // Note: we store endings reversed (i.e. ending abcde stored as edcba). By
     // this trick we can use prefix search (we can call it "reversed ending

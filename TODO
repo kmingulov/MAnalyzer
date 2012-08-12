@@ -1,8 +1,0 @@
-Features:
-    * In prediction: add in result only words got by ending with most length.
-
-Algo:
-    * Prefixes (ПО and НАИ) are hardcoded now. Fix?
-
-Code:
-    * Check all TODOs
