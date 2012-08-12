@@ -1,6 +1,6 @@
 MAnalyzer
 =========
-**SimpleCiv** is morph analyzer.
+**MAnalyzer** is morph analyzer.
 
 Compilation
 ------------
@@ -19,7 +19,7 @@ Usage is simple. Include two header files:
     #include "analyzer/word_infos.hpp"
     #include "analyzer/analyzer.hpp"
 
-Add somewhere add these lines:
+And somewhere add these lines:
 
     // Creating analyzer.
     Analyzer * analyzer = analyzer_new("dics");
