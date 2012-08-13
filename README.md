@@ -1,18 +1,28 @@
 MAnalyzer
 =========
+
 **MAnalyzer** is morph analyzer.
 
 Compilation
 ------------
-Just `make`. To use debug information use `make debug=true`.
 
-Note: this will compile whole program including MAnalyzer, not a dynamic library.
+Just:
 
-Usage
------
+    cd analyzer;
+    make;
+To see debug information while MAnalyzer using use `make debug=true` instead of `make`.
+
+Also you can copy `libmanalyzer.so` file to `/usr/lib/` directory (or just use `-L` flag of g++ compiler).
+
+Dictionary
+----------
+
 First of all you need dictionary. In create_dics/ directory there is script,
 that will make dictionary from sqlite-json-dictionaries for pymorphy. You can
 download them [here](https://bitbucket.org/kmike/pymorphy/downloads).
+
+Usage
+-----
 
 Usage is simple. Include two header files:
 
@@ -21,9 +31,9 @@ Usage is simple. Include two header files:
 
 And somewhere add these lines:
 
-    // Creating analyzer.
+    // Creating analyzer. (dics is directory with dictionary).
     Analyzer * analyzer = analyzer_new("dics");
-    // Array with results.
+    // Array with results. (1024 is array size).
     WordInfos * wi = infos_new(1024);
     // Analyzing word.
     analyzer_get_word_info(analyzer, word, word_size, wi);
@@ -39,7 +49,8 @@ To get information about word use these functions:
     // Gets form's id for analyzed word.
     unsigned short int infos_get_form_id(WordInfos * wi, unsigned int id);
 
+To compile program use `g++ main.cpp -lmanalyzer`.
+
 TODO
 ----
-* In prediction: add in result array only words got by ending with most length.
 * Prefixes (ПО and НАИ) are hardcoded now. Fix?
