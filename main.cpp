@@ -1,68 +1,48 @@
 #include <vector>
+#include <iostream>
 #include <fstream>
 
-#include <cstdio>
 #include <cstring>
 #include <cstdlib>
 
 #include "analyzer/word_infos.hpp"
 #include "analyzer/analyzer.hpp"
 
-void analyze_file(Analyzer * analyzer, const char * filename)
-{
-    std::vector <char *> text;
-    std::vector <int> sizes;
-    std::ifstream input(filename);
-    std::string str;
-
-    WordInfos * wi = infos_new(1024);
-
-    // Reading all file to the memory.
-    while(input >> str)
-    {
-        sizes.push_back(str.size());
-        char * c = (char *) malloc(sizeof(char) * (str.size() + 1));
-        strcpy(c, str.c_str());
-        text.push_back(c);
-    }
-
-    int len = text.size();
-    for(int i = 0; i < len; i++)
-    {
-        if(analyzer_get_word_info(analyzer, text[i], sizes[i], wi))
-        {
-            //~ printf("%d\n", 1);
-        }
-        else
-        {
-            printf("%s\n", text[i]);
-            //~ printf("%d\n", 0);
-        }
-        infos_erase(wi);
-    }
-
-    infos_free(wi);
-}
-
 int main()
 {
     Analyzer * analyzer = analyzer_new("dics");
-
-    //~ analyze_file(analyzer, "input");
-
-    char buffer[1024];
     WordInfos * wi = infos_new(1024);
 
-    while(fgets(&buffer[0], 1024, stdin))
-    {
-        int len = strlen(&buffer[0]) - 1;
-        buffer[len] = '\0';
+    std::ifstream input("dics/gramtab");
+    std::vector <std::string> gramtab;
+    int num;
+    std::string id, info;
 
-        analyzer_get_word_info(analyzer, &buffer[0], len, wi);
+    while(input >> num >> id >> info)
+        gramtab.push_back(info);
+
+    std::string word;
+    char * buffer = (char *) malloc(sizeof(char) * 1024);
+
+    while(std::cin >> word)
+    {
+        strcpy(buffer, word.c_str());
+        analyzer_get_word_info(analyzer, buffer, word.size(), wi);
+
+        #ifndef MANALYZER_DEBUG
+            std::cout << infos_get_size(wi) << " (prediction = " << infos_is_prediction(wi) << "):\n";
+            for(int i = 0; i < infos_get_size(wi); i++)
+                std::cout << "\t" << buffer <<
+                    " " << gramtab[infos_get_form_id(wi, i) - 1] << " -> " <<
+                    infos_get_normal_form(wi, i) <<
+                    " " << gramtab[infos_get_normal_form_id(wi, i) - 1] << "\n";
+        #endif
+
+        infos_erase(wi);
     }
 
+    free(buffer);
     infos_free(wi);
-
     analyzer_free(analyzer);
 
     return 0;

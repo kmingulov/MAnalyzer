@@ -94,6 +94,10 @@ all: make_dawgdics make_rules rules_split_and_sort rules_dics normal_forms endin
 	# Add count of forms to the first line.
 	sed -i "1i`wc -l ../dics/rules/forms | cut -f1 --delimiter=' '`" ../dics/rules/forms
 
+	# Copying gramtab.
+	cp temp/gramtab ../dics/gramtab
+	recode utf8..cp1251 ../dics/gramtab
+
 	# Remove temp.
 	#~ rm -r temp/
 

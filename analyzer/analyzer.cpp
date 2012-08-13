@@ -437,6 +437,8 @@ bool analyzer_predict(Analyzer * analyzer, AnalyzedWord * aw)
 
             MA_DEBUG("[PREDICTION] \tFound ending '%s' (%d, %d).\n", q, end - q, ending_id);
 
+            bool erased = false;
+
             // Go through each rule.
             for(int i = 0; i < rules_count; i++)
             {
@@ -465,9 +467,19 @@ bool analyzer_predict(Analyzer * analyzer, AnalyzedWord * aw)
                             int count = forms_get_length(analyzer -> forms, value);
                             FormInfo * forms = forms_get_form_infos(analyzer -> forms, value);
 
+                            if(count != 0)
+                            {
+                                if(!erased)
+                                {
+                                    erased = true;
+                                    infos_erase(aw -> infos);
+                                }
+
+                                result = true;
+                            }
+
                             for(int j = 0; j < count; j++)
                             {
-                                result = true;
 
                                 char * nf_ending = normal_forms_get_ending(analyzer -> n_forms, rules_ids[i]);
                                 int nf_ending_len = normal_forms_get_ending_len(analyzer -> n_forms, rules_ids[i]);
