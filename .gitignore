@@ -1,5 +1,6 @@
-# Object files.
+# Object and libs files.
 *.o
+*.so
 
 # Hidden files.
 .*
