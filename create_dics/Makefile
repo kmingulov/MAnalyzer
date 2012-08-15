@@ -13,7 +13,7 @@ all: make_dawgdics make_rules rules_split_and_sort rules_dics normal_forms endin
 	# Lemmas, predict prefixes and just prefixes.
 	$(SQLITE) sqlite/lemmas.sqlite "SELECT key FROM shelf ORDER BY key;" > temp/lemmas
 	$(SQLITE) sqlite/misc.sqlite "SELECT value FROM shelf WHERE key = 'prefixes';" | sed s/", "/\\n/g | sed s/[\]\[\"]//g > temp/predict_prefixes
-	$(SQLITE) sqlite/misc.sqlite "SELECT value FROM shelf WHERE key = 'possible_rule_prefixes'" | sed s/", "/\\n/g | sed s/[\]\[\"]//g > temp/prefixes
+	$(SQLITE) sqlite/misc.sqlite "SELECT value FROM shelf WHERE key = 'possible_rule_prefixes'" | sed s/", "/\\n/g | sed s/[\]\[\"]//g > temp/possible_prefixes
 	# Lemmas rules.
 	$(SQLITE) sqlite/lemmas.sqlite "SELECT value FROM shelf ORDER BY key;" | sed s/[\]\[,]//g > temp/lemmas_rules
 	# Raw rules.
@@ -24,6 +24,7 @@ all: make_dawgdics make_rules rules_split_and_sort rules_dics normal_forms endin
 	# Prepare lemmas lexicon.
 	$(RECODE) utf8..cp1251 temp/lemmas
 	# Prepare predict prefixes lexicon.
+	cat temp/possible_prefixes >> temp/predict_prefixes
 	sort temp/predict_prefixes > temp/predict_prefixes_sorted
 	$(RECODE) utf8..cp1251 temp/predict_prefixes_sorted
 	# Prepare endings lexicon. (See make_dawgdics.cpp for some notes.)

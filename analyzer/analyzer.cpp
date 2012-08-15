@@ -146,20 +146,29 @@ static bool analyzer_search_endings(Analyzer * analyzer, AnalyzedWord * aw)
             FormInfo * forms = forms_get_form_infos(analyzer -> forms, value);
             // Check for each prefix and forming result.
             for(int j = 0; j < count; j++)
-                if(aw -> prefix_type == forms[j].prefix)
+                if
+                (
+                    // TODO Ids are hardcoded.
+                    (aw -> prefix_id == 38 && forms[j].prefix == 2) ||
+                    (aw -> prefix_id == 26 && forms[j].prefix == 3) ||
+                    (aw -> prefix_id != 38 && aw -> prefix_id != 26 && forms[j].prefix == 1)
+                )
                 {
                     // Counting length of normal_form word.
                     char * nf_ending = normal_forms_get_ending(analyzer -> n_forms, rules[i + 1]);
                     int nf_ending_len = normal_forms_get_ending_len(analyzer -> n_forms, rules[i + 1]);
-                    int nf_len = aw -> predict_prefix_len + aw -> lemma_len + nf_ending_len;
+                    int nf_len = aw -> prefix_len + aw -> lemma_len + nf_ending_len;
 
                     // Creating new char string -- word in normal form.
                     char * nf = (char *) malloc(sizeof(char) * (nf_len + 1));
 
                     // Copying predict_prefix, lemma and new ending.
-                    memcpy(nf, aw -> word, aw -> predict_prefix_len * sizeof(char));
-                    memcpy(&nf[aw -> predict_prefix_len], aw -> lemma, aw -> lemma_len * sizeof(char));
-                    memcpy(&nf[aw -> predict_prefix_len + aw -> lemma_len], nf_ending, nf_ending_len * sizeof(char));
+                    int start = aw -> prefix_len;
+                    if(aw -> prefix_id == 38 || aw -> prefix_id == 26)
+                        start = 0;
+                    memcpy(nf, aw -> word, start * sizeof(char));
+                    memcpy(&nf[start], aw -> lemma, aw -> lemma_len * sizeof(char));
+                    memcpy(&nf[start + aw -> lemma_len], nf_ending, nf_ending_len * sizeof(char));
                     nf[nf_len] = '\0';
 
                     infos_prepend_word(aw -> infos,
@@ -181,15 +190,10 @@ static bool analyzer_search_endings(Analyzer * analyzer, AnalyzedWord * aw)
 
                         MA_DEBUG("[ANALYSIS] \t\t\t\t%s = ", aw -> word);
 
-                        old_char = aw -> word[aw -> predict_prefix_len];
-                        aw -> word[aw -> predict_prefix_len] = '\0';
+                        old_char = aw -> word[aw -> prefix_len];
+                        aw -> word[aw -> prefix_len] = '\0';
                         MA_DEBUG("%s+", aw -> word);
-                        aw -> word[aw -> predict_prefix_len] = old_char;
-
-                        old_char = aw -> prefix[aw -> prefix_len];
-                        aw -> prefix[aw -> prefix_len] = '\0';
-                        MA_DEBUG("%s(%d)+", aw -> prefix, aw -> prefix_type);
-                        aw -> prefix[aw -> prefix_len] = old_char;
+                        aw -> word[aw -> prefix_len] = old_char;
 
                         old_char = aw -> lemma[aw -> lemma_len];
                         aw -> lemma[aw -> lemma_len] = '\0';
@@ -285,65 +289,6 @@ static bool analyzer_analyze_lemma(Analyzer * analyzer, AnalyzedWord * aw)
     return false;
 }
 
-// This functions cut off the prefix (if exists) and start analyzing lemmas.
-static bool analyzer_analyze_prefix(Analyzer * analyzer, AnalyzedWord * aw)
-{
-    // Preparing.
-    aw -> prefix_type = 1;
-    aw -> lemma = aw -> prefix;
-    aw -> lemma_len = 0;
-
-    // Analyze word (without searching prefix).
-    if(analyzer_analyze_lemma(analyzer, aw))
-        return true;
-
-    // Search prefix and analyze the rest part of the word.
-    // TODO Brute method. Maybe improve it?
-    char * word = aw -> prefix;
-    char old_char;
-    if(aw -> word_size - aw -> predict_prefix_len >= 2)
-    {
-        old_char = word[2]; word[2] = '\0';
-        if(strcmp(word, "ÏÎ") == 0)
-        {
-            word[2] = old_char;
-
-            aw -> prefix_type = 2;
-            aw -> prefix_len = 2;
-            aw -> lemma = aw -> prefix + 2;
-            aw -> lemma_len = 0;
-
-            MA_DEBUG("[ANALYSIS] \tPrefix is ÏÎ (2).\n");
-
-            if(analyzer_analyze_lemma(analyzer, aw))
-                return true;
-        }
-        word[2] = old_char;
-    }
-
-    if(aw -> word_size - aw -> predict_prefix_len >= 3)
-    {
-        old_char = word[3]; word[3] = '\0';
-        if(strcmp(word, "ÍÀÈ") == 0)
-        {
-            word[3] = old_char;
-
-            aw -> prefix_type = 3;
-            aw -> prefix_len = 3;
-            aw -> lemma = aw -> prefix + 3;
-            aw -> lemma_len = 0;
-
-            MA_DEBUG("[ANALYSIS] \tPrefix is ÍÀÈ (3).\n");
-
-            if(analyzer_analyze_lemma(analyzer, aw))
-                return true;
-        }
-        word[3] = old_char;
-    }
-
-    return false;
-}
-
 //******************************************************************************
 // ANALYZER MAIN FUNCTION
 //******************************************************************************
@@ -355,10 +300,10 @@ bool analyzer_get_word_info(Analyzer * analyzer, char * word, unsigned int word_
     MA_DEBUG("[ANALYSIS] Start analysis for '%s'.\n", word);
 
     AnalyzedWord * aw = analyzed_word_new(word, word_size, buffer);
-    aw -> prefix = word;
+    aw -> lemma = word;
 
     // Analyze whole word.
-    if(analyzer_analyze_prefix(analyzer, aw))
+    if(analyzer_analyze_lemma(analyzer, aw))
     {
         MA_DEBUG("[ANALYSIS] Finish analysis.\n");
         analyzed_word_free(aw);
@@ -375,18 +320,21 @@ bool analyzer_get_word_info(Analyzer * analyzer, char * word, unsigned int word_
         // Found predict prefix.
         if(analyzer -> predict_prefixes.has_value(index))
         {
-            aw -> prefix = q + 1;
-            aw -> predict_prefix_len = q + 1 - word;
+            aw -> lemma = q + 1;
+            aw -> lemma_len = 0;
+
+            aw -> prefix_len = q + 1 - word;
+            aw -> prefix_id = analyzer -> predict_prefixes.value(index);
 
             // Debug information.
             #ifdef MANALYZER_DEBUG
                 char old_char = *(q + 1);
                 *(q + 1) = '\0';
-                MA_DEBUG("[ANALYSIS] \tFound predict prefix '%s' (%d).\n", aw -> word, q + 1 - aw -> word);
+                MA_DEBUG("[ANALYSIS] \tFound predict prefix '%s' (%d, %d).\n", aw -> word, q + 1 - aw -> word, aw -> prefix_id);
                 *(q + 1) = old_char;
             #endif
 
-            if(analyzer_analyze_prefix(analyzer, aw))
+            if(analyzer_analyze_lemma(analyzer, aw))
             {
                 MA_DEBUG("[ANALYSIS] Finish analysis.\n");
                 analyzed_word_free(aw);
@@ -449,7 +397,7 @@ bool analyzer_predict(Analyzer * analyzer, AnalyzedWord * aw)
                 while(*l != -1)
                 {
                     // Cutting *l chars -- it's an ending.
-                    // First of all -- check it's enough letters for it.
+                    // First of all -- check it's enough letters for it or not.
                     if(aw -> word_size > *l)
                     {
                         char * ending = &aw -> word[aw -> word_size - *l];

@@ -53,4 +53,4 @@ To compile program use `g++ main.cpp -lmanalyzer`.
 
 TODO
 ----
-* Prefixes (ПО and НАИ) are hardcoded now. Fix?
+* Id of prefixes ПО and НАИ are hardcoded now.

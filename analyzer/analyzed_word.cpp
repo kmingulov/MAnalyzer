@@ -23,15 +23,16 @@ AnalyzedWord * analyzed_word_new(char * word, unsigned int word_size, WordInfos 
     aw -> infos = buffer;
 
     // Make 0 everything else. 0 means "not defined".
-    aw -> prefix = NULL;
     aw -> lemma = NULL;
     aw -> ending = NULL;
-    aw -> predict_prefix_len = 0;
+
     aw -> prefix_len = 0;
     aw -> lemma_len = 0;
     aw -> ending_len = 0;
-    aw -> prefix_type = 0;
+
+    // TODO Make -1 too?
     aw -> lemma_id = 0;
+    aw -> prefix_id = -1; // Exception.
 
     return aw;
 }
@@ -45,9 +46,8 @@ void analyzed_word_prefix_clean_up(AnalyzedWord * aw)
 {
     analyzed_word_lemma_clean_up(aw);
 
-    aw -> prefix = NULL;
     aw -> prefix_len = 0;
-    aw -> prefix_type = 0;
+    aw -> prefix_id = -1;
 }
 
 void analyzed_word_lemma_clean_up(AnalyzedWord * aw)
