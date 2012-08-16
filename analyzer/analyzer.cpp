@@ -146,13 +146,7 @@ static bool analyzer_search_endings(Analyzer * analyzer, AnalyzedWord * aw)
             FormInfo * forms = forms_get_form_infos(analyzer -> forms, value);
             // Check for each prefix and forming result.
             for(int j = 0; j < count; j++)
-                if
-                (
-                    // TODO Ids are hardcoded.
-                    (aw -> prefix_id == 38 && forms[j].prefix == 2) ||
-                    (aw -> prefix_id == 26 && forms[j].prefix == 3) ||
-                    (aw -> prefix_id != 38 && aw -> prefix_id != 26 && forms[j].prefix == 1)
-                )
+                if(aw -> prefix_id == forms[j].prefix)
                 {
                     // Counting length of normal_form word.
                     char * nf_ending = normal_forms_get_ending(analyzer -> n_forms, rules[i + 1]);
@@ -162,10 +156,11 @@ static bool analyzer_search_endings(Analyzer * analyzer, AnalyzedWord * aw)
                     // Creating new char string -- word in normal form.
                     char * nf = (char *) malloc(sizeof(char) * (nf_len + 1));
 
+                    // Don't copy prefix with ids != 0 (ПО and НАИ in russian
+                    // language).
+                    int start = aw -> prefix_id != 0 ? 0 : aw -> prefix_len;
+
                     // Copying predict_prefix, lemma and new ending.
-                    int start = aw -> prefix_len;
-                    if(aw -> prefix_id == 38 || aw -> prefix_id == 26)
-                        start = 0;
                     memcpy(nf, aw -> word, start * sizeof(char));
                     memcpy(&nf[start], aw -> lemma, aw -> lemma_len * sizeof(char));
                     memcpy(&nf[start + aw -> lemma_len], nf_ending, nf_ending_len * sizeof(char));

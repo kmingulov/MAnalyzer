@@ -2,6 +2,7 @@ MAnalyzer
 =========
 
 **MAnalyzer** is morph analyzer.
+*Version*: 0.1
 
 Compilation
 ------------
@@ -10,6 +11,7 @@ Just:
 
     cd analyzer;
     make;
+
 To see debug information while MAnalyzer using use `make debug=true` instead of `make`.
 
 Also you can copy `libmanalyzer.so` file to `/usr/lib/` directory (or just use `-L` flag of g++ compiler).
@@ -53,4 +55,8 @@ To compile program use `g++ main.cpp -lmanalyzer`.
 
 TODO
 ----
-* Id of prefixes ПО and НАИ are hardcoded now.
+* Refactoring of create_dics/* code is needed!
+* Test on english dictionaries.
+* Prevent program from crashing when there is no dictionaries.
+* Upload dictionaries to github.
+* Add GNU LPGL text.

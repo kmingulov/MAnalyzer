@@ -30,9 +30,8 @@ AnalyzedWord * analyzed_word_new(char * word, unsigned int word_size, WordInfos 
     aw -> lemma_len = 0;
     aw -> ending_len = 0;
 
-    // TODO Make -1 too?
     aw -> lemma_id = 0;
-    aw -> prefix_id = -1; // Exception.
+    aw -> prefix_id = 0;
 
     return aw;
 }
@@ -47,7 +46,7 @@ void analyzed_word_prefix_clean_up(AnalyzedWord * aw)
     analyzed_word_lemma_clean_up(aw);
 
     aw -> prefix_len = 0;
-    aw -> prefix_id = -1;
+    aw -> prefix_id = 0;
 }
 
 void analyzed_word_lemma_clean_up(AnalyzedWord * aw)

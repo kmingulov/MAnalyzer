@@ -6,14 +6,16 @@ C = gcc
 C++ = g++
 
 all: make_dawgdics make_rules rules_split_and_sort rules_dics normal_forms ending_rule add_endings_lens
+	rm -rf ../dics temp/
+
 	mkdir -p ../dics
 	mkdir -p temp
 
 	# Preparing data from sqlite-base.
 	# Lemmas, predict prefixes and just prefixes.
 	$(SQLITE) sqlite/lemmas.sqlite "SELECT key FROM shelf ORDER BY key;" > temp/lemmas
-	$(SQLITE) sqlite/misc.sqlite "SELECT value FROM shelf WHERE key = 'prefixes';" | sed s/", "/\\n/g | sed s/[\]\[\"]//g > temp/predict_prefixes
-	$(SQLITE) sqlite/misc.sqlite "SELECT value FROM shelf WHERE key = 'possible_rule_prefixes'" | sed s/", "/\\n/g | sed s/[\]\[\"]//g > temp/possible_prefixes
+	$(SQLITE) sqlite/misc.sqlite "SELECT value FROM shelf WHERE key = 'prefixes';" | sed s/", "/" 0\n"/g | sed s/[\]\[\"]//g > temp/predict_prefixes
+	$(SQLITE) sqlite/misc.sqlite "SELECT value FROM shelf WHERE key = 'possible_rule_prefixes'" | sed s/", "/\\n/g | sed s/[\]\[\"]//g | (while read line; do counter=`echo "$counter+1" | bc -ql`; echo "$$line $$counter"; done;) > temp/possible_prefixes
 	# Lemmas rules.
 	$(SQLITE) sqlite/lemmas.sqlite "SELECT value FROM shelf ORDER BY key;" | sed s/[\]\[,]//g > temp/lemmas_rules
 	# Raw rules.
@@ -124,5 +126,5 @@ add_endings_lens: add_endings_lens.cpp
 	$(C++) -g -o add_endings_lens add_endings_lens.cpp
 
 clean:
-	rm -rf ../dics
+	rm -rf ../dics temp/
 	rm -f lemmas_and_prefixes lemmas_rules rules_split_and_sort rules_dics

@@ -13,10 +13,18 @@ int main()
     unsigned short int number;
     string id, info;
 
-    ifstream gramtab("temp/gramtab");
-    while(gramtab >> number >> id >> info)
+    ifstream ids_file("temp/gramtab");
+    while(ids_file >> number >> id >> info)
         ids[id] = number;
-    gramtab.close();
+    ids_file.close();
+
+    // Loading possible prefixes (that are enumerated from 1).
+    map <string, unsigned short int> prefs;
+
+    ifstream prefs_file("temp/possible_prefixes");
+    while(prefs_file >> id >> number)
+        prefs[id] = number;
+    prefs_file.close();
 
     // Making rules.
     char buffer[1024];
@@ -36,22 +44,18 @@ int main()
         ofstream output(&buffer[0]);
 
         input >> forms_count;
-        //~ output << forms_count << endl;
 
         for(int j = 0; j < forms_count; j++)
         {
             input >> end >> id >> pref;
 
-            if(pref == "*")
-                prefix = 1;
-            else if(pref == "ПО")
-                prefix = 2;
-            else if(pref == "НАИ")
-                prefix = 3;
+            map <string, unsigned short int> :: iterator find = prefs.find(pref);
+            if(find != prefs.end())
+                prefix = find -> second;
             else
                 prefix = 0;
 
-            map <string, unsigned short int> :: iterator find = ids.find(id);
+            find = ids.find(id);
             if(find != ids.end())
                 number = find -> second;
             else
