@@ -20,9 +20,12 @@ struct LemmasRules
 
 LemmasRules * lemmas_rules_fread(const char * filename)
 {
-    LemmasRules * rules = (LemmasRules *) malloc(sizeof(LemmasRules));
-
     FILE * file = fopen(filename, "r");
+
+    if(file == NULL)
+        return NULL;
+
+    LemmasRules * rules = (LemmasRules *) malloc(sizeof(LemmasRules));
 
     // Reading count of them.
     fscanf(file, "%d", &(rules -> count));

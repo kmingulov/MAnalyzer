@@ -51,6 +51,9 @@ Forms * forms_fread(const char * filename)
 {
     FILE * file = fopen(filename, "r");
 
+    if(file == NULL)
+        return NULL;
+
     int count, forms_count;
     int id, prefix;
 

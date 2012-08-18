@@ -37,9 +37,12 @@ struct EndingsRules
 
 EndingsRules * endings_rules_fread(const char * filename)
 {
-    EndingsRules * rules = (EndingsRules *) malloc(sizeof(EndingsRules));
-
     FILE * file = fopen(filename, "r");
+
+    if(file == NULL)
+        return NULL;
+
+    EndingsRules * rules = (EndingsRules *) malloc(sizeof(EndingsRules));
 
     // Reading count of them.
     fscanf(file, "%d", &(rules -> count));
