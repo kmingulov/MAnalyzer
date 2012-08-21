@@ -1,3 +1,8 @@
+/*
+    Copyright (c) 2012 K. Mingulov.
+    See the LICENSE file for copying permission.
+*/
+
 #ifndef ENDINGS_RULES_HPP
 #define ENDINGS_RULES_HPP
 

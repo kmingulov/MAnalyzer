@@ -1,5 +1,5 @@
 # Language (ru or en).
-DICS_LANG			= en
+DICS_LANG			= ru
 
 # Paths.
 SQLITE_BASE_DIR 	= sqlite_$(DICS_LANG)
@@ -114,7 +114,7 @@ all: make_dawgdics make_rules rules_split_and_sort rules_dics normal_forms endin
 	$(RECODE) utf8..cp1251 $(DICS_DIR)/gramtab
 
 	# Remove temp.
-	#~ rm -r temp/
+	rm -r temp/
 
 make_dawgdics: make_dawgdics.cpp
 	$(C++) -g -o make_dawgdics make_dawgdics.cpp

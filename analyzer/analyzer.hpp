@@ -1,3 +1,8 @@
+/*
+    Copyright (c) 2012 K. Mingulov.
+    See the LICENSE file for copying permission.
+*/
+
 #ifndef ANALYZER_HPP
 #define ANALYZER_HPP
 

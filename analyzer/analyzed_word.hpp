@@ -1,3 +1,8 @@
+/*
+    Copyright (c) 2012 K. Mingulov.
+    See the LICENSE file for copying permission.
+*/
+
 #ifndef ANALYZED_WORD_HPP
 #define ANALYZED_WORD_HPP
 

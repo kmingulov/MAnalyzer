@@ -1,3 +1,8 @@
+/*
+    Copyright (c) 2012 K. Mingulov.
+    See the LICENSE file for copying permission.
+*/
+
 #ifndef LEMMAS_RULES_HPP
 #define LEMMAS_RULES_HPP
 

@@ -1,8 +1,9 @@
-MAnalyzer
-=========
+MAnalyzer 0.1
+=============
 
 **MAnalyzer** is morph analyzer.
-*Version*: 0.1
+
+MAnalyzer lib released under *MIT License* (look for LICENSE file). `create_dics/` script and examples in ./main.cpp and ./cache.cpp files have nothing in common with MAnalyzer library. They are released under MIT License too.
 
 Compilation
 ------------
@@ -53,11 +54,15 @@ To get information about word use these functions:
 
 To compile program use `g++ main.cpp -lmanalyzer`.
 
-TODO
+ToDo
 ----
 
 * Refactoring of create_dics/* code is needed!
-* Test on english dictionaries.
 * Prevent program from crashing when there is no dictionaries.
-* Upload dictionaries to github.
-* Add GNU LPGL text.
+
+ChangeLog
+---------
+
+**0.1**
+
+* Initial release.

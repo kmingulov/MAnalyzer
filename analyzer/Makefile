@@ -1,3 +1,8 @@
+#
+#   Copyright (c) 2012 K. Mingulov.
+#   See the LICENSE file for copying permission.
+#
+
 ifeq ($(debug), true)
 	DEBUG_MODE = -g -DMANALYZER_DEBUG=1
 else
