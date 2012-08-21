@@ -60,7 +60,7 @@ all: make_dawgdics make_rules rules_split_and_sort rules_dics normal_forms endin
 	done;
 	$(RECODE) utf8..cp1251 temp/ends;
 	# Creating dawgdics.
-	./make_dawgdics
+	./make_dawgdics $(DICS_DIR)
 
 	# Making lemmas_rules and preparing endings_rules
 	./make_rules temp/lemmas_rules $(DICS_DIR)/lemmas_rules
@@ -92,7 +92,7 @@ all: make_dawgdics make_rules rules_split_and_sort rules_dics normal_forms endin
 	sed -i "1i`wc -l temp/rules_with_counts | cut -f1 --delimiter=' '`" temp/rules_with_counts
 
 	# Making ending_rules.
-	./add_endings_lens
+	./add_endings_lens $(DICS_DIR)/endings_rules
 
 	# Make file with normal forms and add amount of them to the first line.
 	./normal_forms temp/normal_forms $(DICS_DIR)/normal_forms

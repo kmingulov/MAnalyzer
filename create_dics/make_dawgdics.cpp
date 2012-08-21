@@ -39,11 +39,24 @@ void create_dic(const char * input_file, const char * output_file, bool auto_enu
     dic.Write(&output);
 }
 
-int main()
+int main(int argc, char ** argv)
 {
-    create_dic("temp/predict_prefixes_sorted", "../dics/predict_prefixes.dawgdic", false);
-    create_dic("temp/lemmas", "../dics/lemmas.dawgdic");
-    create_dic("temp/ends", "../dics/endings.dawgdic");
+    if(argc < 2)
+    {
+        fprintf(stderr, "Error: too few args.\n");
+        return 1;
+    }
+
+    char buffer[1024];
+
+    sprintf(buffer, "%s/predict_prefixes.dawgdic", argv[1]);
+    create_dic("temp/predict_prefixes_sorted", buffer, false);
+
+    sprintf(buffer, "%s/lemmas.dawgdic", argv[1]);
+    create_dic("temp/lemmas", buffer);
+
+    sprintf(buffer, "%s/endings.dawgdic", argv[1]);
+    create_dic("temp/ends", buffer);
 
     return 0;
 }

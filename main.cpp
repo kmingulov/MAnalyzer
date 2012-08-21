@@ -10,7 +10,7 @@
 
 int main()
 {
-    Analyzer * analyzer = analyzer_new("dics");
+    Analyzer * analyzer = analyzer_new("dics_en");
     WordInfos * wi = infos_new(1024);
 
     std::ifstream input("dics/gramtab");

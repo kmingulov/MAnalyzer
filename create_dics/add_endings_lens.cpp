@@ -2,8 +2,14 @@
 #include <vector>
 using namespace std;
 
-int main()
+int main(int argc, char ** argv)
 {
+    if(argc < 2)
+    {
+        fprintf(stderr, "Error: too few args.\n");
+        return 1;
+    }
+
     ifstream rules("temp/rules_with_counts");
 
     vector < vector <int> > lens;
@@ -32,7 +38,7 @@ int main()
     rules.close();
 
     ifstream input("temp/endings_rules");
-    ofstream output("../dics/endings_rules");
+    ofstream output(argv[1]);
 
     input >> count;
     output << count << endl;
