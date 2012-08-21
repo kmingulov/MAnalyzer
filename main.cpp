@@ -10,10 +10,10 @@
 
 int main()
 {
-    Analyzer * analyzer = analyzer_new("dics_en");
+    Analyzer * analyzer = analyzer_new("dics_ru");
     WordInfos * wi = infos_new(1024);
 
-    std::ifstream input("dics/gramtab");
+    std::ifstream input("dics_ru/gramtab");
     std::vector <std::string> gramtab;
     int num;
     std::string id, info;

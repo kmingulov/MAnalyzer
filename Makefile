@@ -5,7 +5,7 @@ else
 endif
 
 LFLAGS = -Lanalyzer/ $(DEBUG_MODE)
-CFLAGS = -c -O3 $(DEBUG_MODE)
+CFLAGS = -g -c -O3 $(DEBUG_MODE)
 LIBS = -lmanalyzer
 
 ma: main.o
