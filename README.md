@@ -3,7 +3,10 @@ MAnalyzer 0.1
 
 **MAnalyzer** is morph analyzer.
 
-MAnalyzer lib released under *MIT License* (look for LICENSE file). `create_dics/` script and examples in ./main.cpp and ./cache.cpp files have nothing in common with MAnalyzer library. They are released under MIT License too.
+MAnalyzer lib released under *MIT License* (look for LICENSE file).
+`create_dics/` script and examples in ./main.cpp and ./cache.cpp files have
+nothing in common with MAnalyzer library. They are released under MIT License
+too.
 
 Compilation
 ------------
@@ -13,9 +16,11 @@ Just:
     cd analyzer;
     make;
 
-To see debug information while MAnalyzer using use `make debug=true` instead of `make`.
+To see debug information while MAnalyzer using use `make debug=true` instead of
+`make`.
 
-Also you can copy `libmanalyzer.so` file to `/usr/lib/` directory (or just use `-L` flag of g++ compiler).
+Also you can copy `libmanalyzer.so` file to `/usr/lib/` directory (or just use
+`-L` flag of g++ compiler).
 
 Dictionary
 ----------
@@ -23,6 +28,9 @@ Dictionary
 First of all you need dictionary. In create_dics/ directory there is script,
 that will make dictionary from sqlite-json-dictionaries for pymorphy. You can
 download them [here](https://bitbucket.org/kmike/pymorphy/downloads).
+
+Anyway you always can download complete dictionaries from
+[here](https://github.com/Melkogotto/MAnalyzer/downloads)
 
 Usage
 -----
@@ -58,6 +66,7 @@ ToDo
 ----
 
 * Refactoring of create_dics/* code is needed!
+* Upload english dictionary.
 * Prevent program from crashing when there is no dictionaries.
 
 ChangeLog
