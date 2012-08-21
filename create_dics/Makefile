@@ -1,27 +1,39 @@
+# Language (ru or en).
+DICS_LANG			= en
+
+# Paths.
+SQLITE_BASE_DIR 	= sqlite_$(DICS_LANG)
+DICS_DIR			= ../dics_$(DICS_LANG)
+
 # List of used software. Default *nix commands like mkdir, cat, sort and sed
 # aren't added.
-SQLITE = sqlite3
-RECODE = recode
-C = gcc
-C++ = g++
+SQLITE 			 	= sqlite3
+RECODE 				= recode -f
+C 					= gcc
+C++ 				= g++
+
+# If language is english, we don't use recode.
+ifeq ($(DICS_LANG), en)
+	RECODE			= \# recode -f
+endif
 
 all: make_dawgdics make_rules rules_split_and_sort rules_dics normal_forms ending_rule add_endings_lens
-	rm -rf ../dics temp/
+	rm -rf $(DICS_DIR) temp/
 
-	mkdir -p ../dics
+	mkdir -p $(DICS_DIR)
 	mkdir -p temp
 
 	# Preparing data from sqlite-base.
 	# Lemmas, predict prefixes and just prefixes.
-	$(SQLITE) sqlite/lemmas.sqlite "SELECT key FROM shelf ORDER BY key;" > temp/lemmas
-	$(SQLITE) sqlite/misc.sqlite "SELECT value FROM shelf WHERE key = 'prefixes';" | sed s/", "/" 0\n"/g | sed s/[\]\[\"]//g > temp/predict_prefixes
-	$(SQLITE) sqlite/misc.sqlite "SELECT value FROM shelf WHERE key = 'possible_rule_prefixes'" | sed s/", "/\\n/g | sed s/[\]\[\"]//g | (while read line; do counter=`echo "$counter+1" | bc -ql`; echo "$$line $$counter"; done;) > temp/possible_prefixes
+	$(SQLITE) $(SQLITE_BASE_DIR)/lemmas.sqlite "SELECT key FROM shelf ORDER BY key;" > temp/lemmas
+	$(SQLITE) $(SQLITE_BASE_DIR)/misc.sqlite "SELECT value FROM shelf WHERE key = 'prefixes';" | sed s/", "/" 0\n"/g | sed s/[\]\[\"]//g > temp/predict_prefixes
+	$(SQLITE) $(SQLITE_BASE_DIR)/misc.sqlite "SELECT value FROM shelf WHERE key = 'possible_rule_prefixes'" | sed s/", "/\\n/g | sed s/[\]\[\"]//g | (while read line; do counter=`echo "$counter+1" | bc -ql`; echo "$$line $$counter"; done;) > temp/possible_prefixes
 	# Lemmas rules.
-	$(SQLITE) sqlite/lemmas.sqlite "SELECT value FROM shelf ORDER BY key;" | sed s/[\]\[,]//g > temp/lemmas_rules
+	$(SQLITE) $(SQLITE_BASE_DIR)/lemmas.sqlite "SELECT value FROM shelf ORDER BY key;" | sed s/[\]\[,]//g > temp/lemmas_rules
 	# Raw rules.
-	$(SQLITE) sqlite/rules.sqlite "SELECT value FROM shelf;" | sed s/\"\"/*/g | sed s/[\]\[\",]//g > temp/raw_rules
+	$(SQLITE) $(SQLITE_BASE_DIR)/rules.sqlite "SELECT value FROM shelf;" | sed s/\"\"/*/g | sed s/[\]\[\",]//g > temp/raw_rules
 	# Endings (for prediction).
-	$(SQLITE) sqlite/endings.sqlite "SELECT * FROM shelf ORDER BY key;" > temp/endings
+	$(SQLITE) $(SQLITE_BASE_DIR)/endings.sqlite "SELECT * FROM shelf ORDER BY key;" > temp/endings
 
 	# Prepare lemmas lexicon.
 	$(RECODE) utf8..cp1251 temp/lemmas
@@ -30,14 +42,14 @@ all: make_dawgdics make_rules rules_split_and_sort rules_dics normal_forms endin
 	sort temp/predict_prefixes > temp/predict_prefixes_sorted
 	$(RECODE) utf8..cp1251 temp/predict_prefixes_sorted
 	# Prepare endings lexicon. (See make_dawgdics.cpp for some notes.)
-	$(RECODE) -f utf8..cp1251 temp/endings;
+	$(RECODE) utf8..cp1251 temp/endings;
 	# Make reversed endings, add counts and delete excess chars.
 	cat temp/endings | while read line; do \
 		new_line=`echo "$$line" | ./ending_rule`; \
 		echo "$$new_line" >> temp/endings_reversed; \
 	done;
 	# Sort.
-	$(RECODE) -f cp1251..utf8 temp/endings_reversed;
+	$(RECODE) cp1251..utf8 temp/endings_reversed;
 	sort temp/endings_reversed > temp/endings_sorted;
 	# Split to 2 files.
 	cat temp/endings_sorted | while read line; do \
@@ -51,13 +63,13 @@ all: make_dawgdics make_rules rules_split_and_sort rules_dics normal_forms endin
 	./make_dawgdics
 
 	# Making lemmas_rules and preparing endings_rules
-	./make_rules temp/lemmas_rules ../dics/lemmas_rules
+	./make_rules temp/lemmas_rules $(DICS_DIR)/lemmas_rules
 	# Add count of rules to the first line.
-	sed -i "1i`wc -l ../dics/lemmas_rules | cut -f1 --delimiter=' '`" ../dics/lemmas_rules
+	sed -i "1i`wc -l $(DICS_DIR)/lemmas_rules | cut -f1 --delimiter=' '`" $(DICS_DIR)/lemmas_rules
 	sed -i "1i`wc -l temp/endings_rules | cut -f1 --delimiter=' '`" temp/endings_rules
 
 	# Making gramtab.
-	$(SQLITE) sqlite/misc.sqlite "SELECT value FROM shelf WHERE key='gramtab'" | \
+	$(SQLITE) $(SQLITE_BASE_DIR)/misc.sqlite "SELECT value FROM shelf WHERE key='gramtab'" | \
 	# Add newlines. \
 	sed s/],\ \"/]\\n/g | \
 	# Remove quotes. \
@@ -83,23 +95,23 @@ all: make_dawgdics make_rules rules_split_and_sort rules_dics normal_forms endin
 	./add_endings_lens
 
 	# Make file with normal forms and add amount of them to the first line.
-	./normal_forms
-	sed -i "1i`wc -l ../dics/normal_forms | cut -f1 --delimiter=' '`" ../dics/normal_forms
-	$(RECODE) -f utf8..cp1251 ../dics/normal_forms
+	./normal_forms temp/normal_forms $(DICS_DIR)/normal_forms
+	sed -i "1i`wc -l $(DICS_DIR)/normal_forms | cut -f1 --delimiter=' '`" $(DICS_DIR)/normal_forms
+	$(RECODE) utf8..cp1251 $(DICS_DIR)/normal_forms
 	# Splitting raw rules into files and sort them.
 	mkdir -p temp/splitted/
 	./rules_split_and_sort
 	# Convert each rule to dawgdic.
 	$(RECODE) -f utf8..cp1251 temp/splitted/*
-	mkdir -p ../dics/rules/
-	./rules_dics
-	cp temp/splitted/info ../dics/rules/info
+	mkdir -p $(DICS_DIR)/rules/
+	./rules_dics temp/splitted $(DICS_DIR)/rules
+	cp temp/splitted/info $(DICS_DIR)/rules/info
 	# Add count of forms to the first line.
-	sed -i "1i`wc -l ../dics/rules/forms | cut -f1 --delimiter=' '`" ../dics/rules/forms
+	sed -i "1i`wc -l $(DICS_DIR)/rules/forms | cut -f1 --delimiter=' '`" $(DICS_DIR)/rules/forms
 
 	# Copying gramtab.
-	cp temp/gramtab ../dics/gramtab
-	recode utf8..cp1251 ../dics/gramtab
+	cp temp/gramtab $(DICS_DIR)/gramtab
+	$(RECODE) utf8..cp1251 $(DICS_DIR)/gramtab
 
 	# Remove temp.
 	#~ rm -r temp/
@@ -126,5 +138,5 @@ add_endings_lens: add_endings_lens.cpp
 	$(C++) -g -o add_endings_lens add_endings_lens.cpp
 
 clean:
-	rm -rf ../dics temp/
+	rm -rf $(DICS_DIR) temp/
 	rm -f lemmas_and_prefixes lemmas_rules rules_split_and_sort rules_dics

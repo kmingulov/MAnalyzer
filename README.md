@@ -55,6 +55,7 @@ To compile program use `g++ main.cpp -lmanalyzer`.
 
 TODO
 ----
+
 * Refactoring of create_dics/* code is needed!
 * Test on english dictionaries.
 * Prevent program from crashing when there is no dictionaries.

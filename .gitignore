@@ -27,5 +27,5 @@ create_dics/add_endings_lens
 create_dics/temp
 
 # Dictionaries and source of them.
-dics/
-create_dics/sqlite
+dics_*/
+create_dics/sqlite_*

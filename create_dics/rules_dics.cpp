@@ -101,11 +101,18 @@ void forms_update_form(Forms * forms, unsigned int index, unsigned short int id,
 //******************************************************************************
 // MAIN()
 //******************************************************************************
-int main()
+int main(int argc, char ** argv)
 {
+    if(argc < 3)
+    {
+        fprintf(stderr, "Error: too few args.\n");
+        return 1;
+    }
+
     char buffer[1024];
 
-    ifstream info("temp/splitted/info");
+    sprintf(buffer, "%s/info", argv[1]);
+    ifstream info(buffer);
     int count;
     info >> count;
     info.close();
@@ -118,8 +125,8 @@ int main()
     for(int i = 0; i < count; i++)
     {
         // Opening the file.
-        sprintf(&buffer[0], "temp/splitted/%d", i);
-        ifstream input(&buffer[0]);
+        sprintf(buffer, "%s/%d", argv[1], i);
+        ifstream input(buffer);
 
         // Creating new dawg.
         DawgBuilder dawg_builder;
@@ -146,7 +153,7 @@ int main()
 
         input.close();
 
-        sprintf(&buffer[0], "../dics/rules/%d.dawgdic", i);
+        sprintf(buffer, "%s/%d.dawgdic", argv[2], i);
 
         // Create dawgdic.
         Dawg dawg;
@@ -155,11 +162,12 @@ int main()
         DictionaryBuilder :: Build(dawg, &dic);
 
         // Save dic to file.
-        ofstream output(&buffer[0], ios::binary);
+        ofstream output(buffer, ios::binary);
         dic.Write(&output);
     }
 
-    ofstream output("../dics/rules/forms");
+    sprintf(buffer, "%s/forms", argv[2]);
+    ofstream output(buffer);
 
     for(int i = 0; i < forms -> current; i++)
     {

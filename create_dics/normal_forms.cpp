@@ -5,8 +5,14 @@
 
 using namespace std;
 
-int main()
+int main(int argc, char ** argv)
 {
+    if(argc < 3)
+    {
+        fprintf(stderr, "Error: too few args.\n");
+        return 1;
+    }
+
     // Loading gramtab (to move id by short int).
     map <string, unsigned short int> ids;
 
@@ -19,8 +25,8 @@ int main()
     gramtab.close();
 
     // Make file with normal forms.
-    ifstream input("temp/normal_forms");
-    ofstream output("../dics/normal_forms");
+    ifstream input(argv[1]);
+    ofstream output(argv[2]);
 
     string ending, pref;
     int prefix;
