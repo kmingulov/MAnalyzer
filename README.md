@@ -30,7 +30,7 @@ that will make dictionary from sqlite-json-dictionaries for pymorphy. You can
 download them [here](https://bitbucket.org/kmike/pymorphy/downloads).
 
 Anyway you always can download complete dictionaries from
-[here](https://github.com/Melkogotto/MAnalyzer/downloads)
+[here](https://github.com/Melkogotto/MAnalyzer/downloads).
 
 Usage
 -----
@@ -66,7 +66,6 @@ ToDo
 ----
 
 * Refactoring of create_dics/* code is needed!
-* Upload english dictionary.
 * Prevent program from crashing when there is no dictionaries.
 
 ChangeLog
