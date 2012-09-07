@@ -3,8 +3,8 @@
 #include <cstring>
 #include <fstream>
 
-#include "forms.hpp"
-#include "rules.hpp"
+#include "forms.h"
+#include "rules.h"
 
 //******************************************************************************
 // STRUCT

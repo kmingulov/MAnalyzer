@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "normal_forms.hpp"
+#include "normal_forms.h"
 
 //******************************************************************************
 // STRUCT

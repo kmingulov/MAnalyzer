@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "lemmas_rules.hpp"
+#include "lemmas_rules.h"
 
 //******************************************************************************
 // STRUCT

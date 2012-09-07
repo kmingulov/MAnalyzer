@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "endings_rules.hpp"
+#include "endings_rules.h"
 
 //******************************************************************************
 // DEFINES

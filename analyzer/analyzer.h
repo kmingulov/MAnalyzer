@@ -6,7 +6,7 @@
 #ifndef ANALYZER_HPP
 #define ANALYZER_HPP
 
-#include "word_infos.hpp"
+#include "word_infos.h"
 
 /*
     Morph analyzer's struct.

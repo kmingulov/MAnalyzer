@@ -6,7 +6,7 @@
 #ifndef ANALYZED_WORD_HPP
 #define ANALYZED_WORD_HPP
 
-#include "word_infos.hpp"
+#include "word_infos.h"
 
 /*
     Analyzed word. Used in static analyzer's functions.

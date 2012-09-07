@@ -5,8 +5,8 @@
 #include <cstring>
 #include <cstdlib>
 
-#include "analyzer/word_infos.hpp"
-#include "analyzer/analyzer.hpp"
+#include "analyzer/word_infos.h"
+#include "analyzer/analyzer.h"
 
 int main()
 {

@@ -11,14 +11,14 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "forms.hpp"
-#include "rules.hpp"
-#include "lemmas_rules.hpp"
-#include "endings_rules.hpp"
-#include "normal_forms.hpp"
-#include "analyzed_word.hpp"
+#include "forms.h"
+#include "rules.h"
+#include "lemmas_rules.h"
+#include "endings_rules.h"
+#include "normal_forms.h"
+#include "analyzed_word.h"
 
-#include "analyzer.hpp"
+#include "analyzer.h"
 
 //******************************************************************************
 // DEBUG DEFINES.

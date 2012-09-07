@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include "word_infos.hpp"
+#include "word_infos.h"
 
 //******************************************************************************
 // STRUCTS

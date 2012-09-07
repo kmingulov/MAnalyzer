@@ -6,7 +6,7 @@
 #include <cstdlib>
 #include <cstdio>
 
-#include "analyzed_word.hpp"
+#include "analyzed_word.h"
 
 //******************************************************************************
 // STRUCT (DEFINED IN ANALYZED_WORD.HPP)
