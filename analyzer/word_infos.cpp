@@ -1,3 +1,8 @@
+/**
+ * @file word_infos.cpp
+ * @brief Contains implementations of WordInfos' functions.
+ */
+
 #include <cstdio>
 #include <cstdlib>
 
@@ -7,29 +12,42 @@
 // STRUCTS
 //******************************************************************************
 
+/**
+ * @struct WordInfo
+ * @brief Contains information about one form, is an element of WordInfos array.
+ */
 struct WordInfo
 {
-    // Normal form and it's gram. type.
+    /// Pointer to normal form.
     char * n_form;
+
+    /// @brief Grammar type of the normal form. By using grammar type and
+    ///        gramtab you can get grammar info.
     unsigned short int n_form_id;
 
-    // Grammar type of word.
+    /// Grammar type of the word.
     unsigned short int form_id;
 };
 
+/**
+ * @struct WordInfos
+ */
 struct WordInfos
 {
-    // Current size and max size of array.
+    /// Current size of the array.
     unsigned int size;
+
+    /// Maximum size of the array.
     unsigned int max_size;
 
-    // Flag "prepend error": cannot add new element, because array is full.
+    /// Prepend error flag: cannot add new element, because array is full.
     bool prepend_error;
 
-    // Flag "prediction": these results was get by prediction. This word is
-    // unknown.
+    /// @brief Prediction flag: these results was get by prediction. Analyzed
+    ///        word is unknown.
     bool prediction;
 
+    /// Array with WordInfo's.
     WordInfo * infos;
 };
 
