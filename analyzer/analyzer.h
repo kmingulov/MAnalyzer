@@ -16,11 +16,10 @@
 /**
  * @struct Analyzer
  *
- * @brief
- * Morph analyzer's struct. Implements morph analysis: it allow to find grammar
- * info of the word and its normal form. There is a prediction for unknown
- * words.
-*/
+ * @brief Morph analyzer's struct. Implements morph analysis: it allow to find
+ *        grammar info of the word and its normal form. There is a prediction
+ *        for unknown words.
+ */
 struct Analyzer;
 
 /**
