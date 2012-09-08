@@ -3,6 +3,11 @@
     See the LICENSE file for copying permission.
 */
 
+/**
+ * @file analyzer.cpp
+ * @brief Contains implementations of Analyzer's functions.
+ */
+
 #include <fstream>
 #include <sstream>
 
@@ -23,6 +28,15 @@
 //******************************************************************************
 // DEBUG DEFINES.
 //******************************************************************************
+
+/**
+ * @def MA_DEBUG
+ *
+ * MAnalyzer debug macro. If MAnalyzer library compiled with -debug key, debug
+ * information will print to stderr while library using.
+ *
+ * Syntax is similar to printf() syntax.
+ */
 #ifdef MANALYZER_DEBUG
     #define MA_DEBUG(...) { fprintf(stderr, __VA_ARGS__); }
 #else
@@ -33,26 +47,33 @@
 // STRUCT.
 //******************************************************************************
 
+/**
+ * @struct Analyzer
+*/
 struct Analyzer
 {
-    // Prefixes', lemmas' and endings' dictionaries.
+    /// @brief DAWG dictionary with prefixes.
     dawgdic::Dictionary predict_prefixes;
+    /// @brief DAWG dictionary with lemmas.
     dawgdic::Dictionary lemmas;
+    /// @brief DAWG dictionary with endings.
     dawgdic::Dictionary endings;
 
-    // Rules for lemmas and endings (array with id of rules for each lemma/
-    // ending).
+    /// @brief The array with ids of rules for each lemma id.
     LemmasRules * l_rules;
+    /// @brief The array with ids of rules for each ending id.
     EndingsRules * e_rules;
 
-    // Array with normal forms.
+    /// @brief The array with normal forms for rule and ending.
     NormalForms * n_forms;
 
-    // All forms.
-    Forms * forms;
-
-    // Rules.
+    /// @brief The array with DAWG dictionary for each rule. Each DAWG
+    /// dictionary contains endings, by the ending we can get an array with
+    /// forms for this ending and rule.
     Rules * rules;
+
+    /// @brief The array of all for rule and ending.
+    Forms * forms;
 };
 
 //******************************************************************************
@@ -127,7 +148,13 @@ void analyzer_free(Analyzer * analyzer)
 // HELPFULL FOR ANALYSIS
 //******************************************************************************
 
-// Searches endings for word from lemma's rules.
+/**
+ * @brief Searches endings for word.
+ * @param analyzer  used analyzer
+ * @param aw        analyzing word
+ * @return true, if found at least one ending
+ * @return false, if failed
+ */
 static bool analyzer_search_endings(Analyzer * analyzer, AnalyzedWord * aw)
 {
     bool result = false;
@@ -212,7 +239,14 @@ static bool analyzer_search_endings(Analyzer * analyzer, AnalyzedWord * aw)
     return result;
 }
 
-// Searches lemmas by word.
+/**
+ * @brief Searches lemmas by word and spawn analyzer_search_endings() for each
+ *        lemma.
+ * @param analyzer  used analyzer
+ * @param aw        analyzing word
+ * @return true, if found at least one lemma
+ * @return false, if failed
+ */
 bool analyzer_search_lemmas(Analyzer * analyzer, AnalyzedWord * aw)
 {
     bool result = false;
@@ -252,8 +286,15 @@ bool analyzer_search_lemmas(Analyzer * analyzer, AnalyzedWord * aw)
     return result;
 }
 
-// This function is very similar to analyzer_search_lemmas(). It doesn't search
-// lemmas, it uses special lemma (#). So word is just an ending for this lemma.
+/**
+ * @brief Is similar to analyzer_search_lemmas(), but doesn't search any lemmas
+ *        and uses special lemma (#) instead. Whole word is the ending in that
+ *        case.
+ * @param analyzer  used analyzer
+ * @param aw        analyzing word
+ * @return true, if found word in special lemma's rules
+ * @return false, if failed
+ */
 static bool analyzer_special_lemma(Analyzer * analyzer, AnalyzedWord * aw)
 {
     MA_DEBUG("[ANALYSIS] \tFound lemma '#' (1, 0). Searching in rules (possible) ending '%s' (%d).\n", aw -> ending, aw -> ending_len);
@@ -261,11 +302,16 @@ static bool analyzer_special_lemma(Analyzer * analyzer, AnalyzedWord * aw)
     return analyzer_search_endings(analyzer, aw);
 }
 
-//******************************************************************************
-// HELPFULL STATIC FUNCTIONS.
-//******************************************************************************
-
 // This function starts searching lemmas (or use special lemma).
+/**
+ * @brief First tries to find lemma (by analyzer_search_lemmas() function). If
+ *        failed tries to use special lemma (by analyzer_special_lemma()
+ *        function). If failed again returns false
+ * @param analyzer  used analyzer
+ * @param aw        analyzing word
+ * @return true, if found any lemma
+ * @return false, if failed
+ */
 static bool analyzer_analyze_lemma(Analyzer * analyzer, AnalyzedWord * aw)
 {
     // Clean up.
@@ -293,6 +339,14 @@ static bool analyzer_analyze_lemma(Analyzer * analyzer, AnalyzedWord * aw)
 // ANALYZER MAIN FUNCTION
 //******************************************************************************
 
+/**
+ * @brief Prediction function. Spawned by analyzer_get_word_info() if analysis
+ *        failed. Predicts grammar info and normal form for unknown words.
+ * @param analyzer  used analyzer
+ * @param aw        analyzing word
+ * @return true, if found any lemma
+ * @return false, if failed
+ */
 bool analyzer_predict(Analyzer * analyzer, AnalyzedWord * aw);
 
 bool analyzer_get_word_info(Analyzer * analyzer, char * word, unsigned int word_size, WordInfos * buffer)
