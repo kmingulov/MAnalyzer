@@ -3,6 +3,11 @@
     See the LICENSE file for copying permission.
 */
 
+/**
+ * @file analyzed_word.cpp
+ * @brief Contains implementations of AnalyzedWord's functions.
+ */
+
 #include <cstdlib>
 #include <cstdio>
 
