@@ -29,3 +29,7 @@ create_dics/temp
 # Dictionaries and source of them.
 dics_*/
 create_dics/sqlite_*
+
+# Doxygen outputs.
+html/
+latex/
