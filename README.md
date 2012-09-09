@@ -1,11 +1,18 @@
-MAnalyzer 0.1
+MAnalyzer 0.1 {#mainpage}
 =============
 
-**MAnalyzer** is morph analyzer.
+**MAnalyzer** is fast morph analyzer library, written in C++. It is based on
+pymorphy algorithm [(read in russian)]
+(http://packages.python.org/pymorphy/algo.html) and dictionaries.
+
+Features:
+* Return grammar info of the word and normal form with grammar info for the
+  word.
+* Prediction for unknown words.
 
 MAnalyzer lib released under *MIT License* (look for LICENSE file).
-`create_dics/` script and examples in ./main.cpp and ./cache.cpp files have
-nothing in common with MAnalyzer library. They are released under MIT License
+`create_dics/` script and examples in `./main.cpp` and `./cache.cpp` files have
+nothing in common with MAnalyzer library, they are released under MIT License
 too.
 
 Compilation
@@ -13,8 +20,8 @@ Compilation
 
 Just:
 
-    cd analyzer;
-    make;
+    cd analyzer
+    make
 
 To see debug information while MAnalyzer using use `make debug=true` instead of
 `make`.
@@ -62,9 +69,14 @@ To get information about word use these functions:
 
 To compile program use `g++ main.cpp -lmanalyzer`.
 
+More information you can find out in documentation.
+
 ToDo
 ----
 
+* Add dawgdic source code and compile library using it.
+* Finish documentation (LemmasRules', EndingsRules' descriptions and algorithm's
+  description).
 * Refactoring of create_dics/* code is needed!
 * Prevent program from crashing when there is no dictionaries.
 
@@ -72,5 +84,4 @@ ChangeLog
 ---------
 
 **0.1**
-
 * Initial release.
