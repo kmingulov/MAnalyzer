@@ -1,3 +1,8 @@
+/**
+ * @file normal_forms.cpp
+ * @brief Contains implementations of NormalForms' functions.
+ */
+
 #include <fstream>
 
 #include <cstdio>
@@ -10,16 +15,31 @@
 // STRUCT
 //******************************************************************************
 
+/**
+ * @struct NormalForm
+ * @brief Contains information about _one_ normal form.
+ */
 struct NormalForm
 {
+    /// Pointer to normal form's ending.
     char * ending;
+
+    /// Ending's length.
     unsigned short int ending_len;
+
+    /// Normal form's grammar type.
     unsigned short int id;
 };
 
+/**
+ * @struct NormalForms
+ */
 struct NormalForms
 {
+    /// Amount of normal forms.
     unsigned int count;
+
+    /// Array with normal forms.
     NormalForm * forms;
 };
 
@@ -91,9 +111,4 @@ unsigned short int normal_forms_get_ending_len(NormalForms * nf, unsigned int id
 unsigned short int normal_forms_get_type(NormalForms * nf, unsigned int id)
 {
     return nf -> forms[id].id;
-}
-
-char normal_forms_get_prefix(NormalForms * nf, unsigned int id)
-{
-    return 1;
 }
