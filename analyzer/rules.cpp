@@ -1,3 +1,8 @@
+/**
+ * @file rules.cpp
+ * @brief Contains implementaions of Rules' functions.
+ */
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -10,12 +15,15 @@
 // STRUCT
 //******************************************************************************
 
+/**
+ * @struct Rules
+ */
 struct Rules
 {
-    // Count of dics.
+    /// Amount of rules (and dictionaries).
     unsigned int count;
 
-    // Dics (with endings) for rules.
+    /// Array with dictionaries.
     dawgdic::Dictionary * dics;
 };
 
