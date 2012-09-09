@@ -1,7 +1,7 @@
-/*
-    Copyright (c) 2012 K. Mingulov.
-    See the LICENSE file for copying permission.
-*/
+/**
+ * @file forms.cpp
+ * @brief Contains implementations of Forms' functions.
+ */
 
 #include <cstdlib>
 #include <cstdio>
@@ -12,13 +12,20 @@
 // STRUCTS
 //******************************************************************************
 
-// Defined in forms.hpp file.
 struct FormInfo;
 
+/**
+ * @struct Forms.
+ */
 struct Forms
 {
+    /// Array length.
     int count;
+
+    /// Array with sizes.
     char * counts;
+
+    /// Array with FormInfos.
     FormInfo ** forms;
 };
 
