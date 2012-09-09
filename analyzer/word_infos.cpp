@@ -152,7 +152,7 @@ bool infos_is_prediction(WordInfos * wi)
     return wi -> prediction;
 }
 
-bool infos_have_prepend_word(WordInfos * wi)
+bool infos_have_prepend_error(WordInfos * wi)
 {
     return wi -> prepend_error;
 }
