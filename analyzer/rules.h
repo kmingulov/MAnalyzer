@@ -6,7 +6,7 @@
 #ifndef RULES_H
 #define RULES_H
 
-#include <dawgdic/dictionary.h>
+#include "../dawgdic/dictionary.h"
 
 /**
  * @struct Rules

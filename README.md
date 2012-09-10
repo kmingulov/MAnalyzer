@@ -10,7 +10,7 @@ Features:
   word.
 * Prediction for unknown words.
 
-MAnalyzer lib released under *MIT License* (look for LICENSE file).
+MAnalyzer lib released under *MIT License* (look for analyzer/LICENSE file).
 `create_dics/` script and examples in `./main.cpp` and `./cache.cpp` files have
 nothing in common with MAnalyzer library, they are released under MIT License
 too.
@@ -62,7 +62,7 @@ To get information about word use these functions:
     int infos_get_size(WordInfos * wi);
     // Gets normal form for result.
     char * infos_get_normal_form(WordInfos * wi, unsigned int id);
-    // Gets normal form's id. 
+    // Gets normal form's id.
     unsigned short int infos_get_normal_form_id(WordInfos * wi, unsigned int id);
     // Gets form's id for analyzed word.
     unsigned short int infos_get_form_id(WordInfos * wi, unsigned int id);

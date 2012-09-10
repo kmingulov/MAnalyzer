@@ -11,7 +11,7 @@
 #include <fstream>
 #include <sstream>
 
-#include <dawgdic/dictionary.h>
+#include "../dawgdic/dictionary.h"
 
 #include <cstdlib>
 #include <cstring>
